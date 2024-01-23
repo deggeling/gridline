@@ -9,20 +9,48 @@
             width: 100%;
             border-collapse: collapse;
         }
-    
-        th, td {
+
+        th,
+        td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
-    
+
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
-    
+
         th {
             background-color: #4CAF50;
             color: white;
+        }
+
+        #vehiclesButton {
+            background-color: #4CAF50;
+            /* Green background */
+            border: none;
+            /* No border */
+            color: white;
+            /* White text */
+            padding: 15px 32px;
+            /* Some padding */
+            text-align: center;
+            /* Centered text */
+            text-decoration: none;
+            /* No underline */
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            /* Pointer/hand icon */
+            transition-duration: 0.4s;
+            /* Transition effect */
+        }
+
+        #vehiclesButton:hover {
+            background-color: #45a049;
+            /* Green background on hover */
         }
     </style>
     <script>
@@ -49,7 +77,13 @@
                     });
 
                     tableElement.appendChild(tbody);
-                    return tableElement;
+
+                    // Create a div element and add the table to it
+                    var divElement = document.createElement("DIV");
+                    divElement.className = "responsive-table";
+                    divElement.appendChild(tableElement);
+
+                    return divElement;
                 },
                 refreshPage = function () {
                     api.call("Get", {
