@@ -99,7 +99,7 @@
                         resultsLimit: 10
                     }, function (result) {
                         center.addEventListener("click", goToVehicles, false);
-                        center.appendChild(listCreator(result));
+                        center.appendChild(tableCreator(result));
                     }, function (error) {
                         console.log(error.message);
                     });
