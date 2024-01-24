@@ -5,23 +5,29 @@
     <title>Custom Integration Example Table</title>
     <!-- <link rel="stylesheet" href="integrationExample.css" /> -->
     <style>
-        table {
+        .responsive-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .responsive-table table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        th,
-        td {
+        .responsive-table th,
+        .responsive-table td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
+            font-size: 14px;
         }
 
-        tr:nth-child(even) {
+        .responsive-table tr:nth-child(even) {
             background-color: #f2f2f2;
         }
 
-        th {
+        .responsive-table th {
             background-color: #4CAF50;
             color: white;
         }
