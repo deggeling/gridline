@@ -3,62 +3,6 @@
 
 <head>
     <title>DE Integration Example Table</title>
-    <style>
-        .de-responsive-table {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        .de-responsive-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .de-responsive-table th,
-        .de-responsive-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-            font-size: 14px;
-        }
-
-        .de-responsive-table tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        .de-responsive-table th {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        #de_vehiclesButton.de-vehicles-button {
-            background-color: #ED8B00 !important;
-            /* Green background */
-            border: none;
-            /* No border */
-            color: white;
-            /* White text */
-            padding: 15px 32px;
-            /* Some padding */
-            text-align: center;
-            /* Centered text */
-            text-decoration: none;
-            /* No underline */
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            /* Pointer/hand icon */
-            transition-duration: 0.4s;
-            /* Transition effect */
-        }
-
-        #de_vehiclesButton.de-vehicles-button:hover {
-            background-color: #45a049 !important;
-            /* Green background on hover */
-        }
-    </style>
-
     <script>
         geotab.addin.integrationExample = function (api, state) {
             var center = document.getElementById("center"),
@@ -138,6 +82,7 @@
     <div id="center">
         <button id="de_vehiclesButton" class="de-vehicles-button">Go to assets page</button>
     </div>
+    <link rel="stylesheet" href="IntegrationExampleTableStyles.css">
 </body>
 
 </html>
