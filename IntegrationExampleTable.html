@@ -11,24 +11,51 @@
                     var thead = document.createElement("THEAD");
                     var tbody = document.createElement("TBODY");
                     var tr = document.createElement("TR");
+
+                    // Create "Name" header
                     var th = document.createElement("TH");
                     th.textContent = "Name";
                     tr.appendChild(th);
+
+                    // Create "Serial Number" header
+                    var thSerialNumber = document.createElement("TH");
+                    thSerialNumber.textContent = "Serial Number";
+                    tr.appendChild(thSerialNumber);
+
+                    
+                    // Append Completed Header row to the table
                     thead.appendChild(tr);
                     tableElement.appendChild(thead);
 
+
+                    // Create table rows and data entries out of API results object
                     entities.forEach(function (entity) {
+                        // Create a new row for the entity
                         var tr = document.createElement("TR");
+
+                        // Create "Name" cell with an attribute defined by its id for later
                         var td = document.createElement("TD");
                         td.textContent = entity.name;
                         td.setAttribute("data-id", entity.id);
                         tr.appendChild(td);
+
+                        // Create "Serial Number" cell, if property doesnt exist on object, replace with N/A
+                        var tdSerialNumber = document.createElement("TD");
+                        if (entity.serialNumber) { // Check if the property exists
+                            tdSerialNumber.textContent = entity.serialNumber;
+                        } else {
+                            tdSerialNumber.textContent = "N/A";
+                        }
+                        tr.appendChild(tdSerialNumber);
+
+                        // Append Completed new row to the in progress table body
                         tbody.appendChild(tr);
                     });
 
+                    // Append the output table body to the actual table element
                     tableElement.appendChild(tbody);
 
-                    // Create a div element and add the table to it
+                    // Create a div element and add the now completed table to it
                     var divElement = document.createElement("DIV");
                     divElement.className = "de-responsive-table";
                     divElement.appendChild(tableElement);
