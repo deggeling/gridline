@@ -26,7 +26,7 @@
 }
 
 #de_vehiclesButton.de-vehicles-button {
-    background-color: #ED8B00 !important;
+    background-color: #ED8B00;
     /* Green background */
     border: none;
     /* No border */
@@ -48,6 +48,6 @@
 }
 
 #de_vehiclesButton.de-vehicles-button:hover {
-    background-color: #45a049 !important;
+    background-color: #45a049;
     /* Green background on hover */
 }
