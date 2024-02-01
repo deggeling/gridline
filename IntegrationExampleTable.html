@@ -24,7 +24,7 @@
 
                     // Create "Install Date" header
                     var thInstallDate = document.createElement("TH");
-                    thInstallDate.textContent = "Install Date";
+                    thInstallDate.textContent = "Install Date (latest first)";
                     tr.appendChild(thInstallDate);
 
                     // Create "Made Historic" header
@@ -35,6 +35,13 @@
                     // Append Completed Header row to the table
                     thead.appendChild(tr);
                     tableElement.appendChild(thead);
+
+                    // Sort entites before creating table rows in descending order (latest first)
+                    entities.sort(function (a, b) {
+                        var dateA = a.activeFrom ? new Date(a.activeFrom) : new Date(-8640000000000000);  //Earliest date in JS for no prop/no date
+                        var dateB = b.activeFrom ? new Date(b.activeFrom) : new Date(-8640000000000000);
+                        return dateB - dateA; // sort in descending order
+                    });
 
 
                     // Create table rows and data entries out of API results object
@@ -57,28 +64,28 @@
                         }
                         tr.appendChild(tdSerialNumber);
 
-                        // Create ActiveFrom cell, format example content "activeFrom": "2015-02-12T22:40:57.522Z" to 2/12/2015 22:40:57
+                        // Create ActiveFrom cell, format example content "activeFrom": "2015-02-12T22:40:57.522Z" to 02/12/2015 10:40:57 PM
                         var tdActiveFrom = document.createElement("TD");
                         if (entity.activeFrom) {
                             var activeFromDate = new Date(entity.activeFrom);
                             var dateFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-                            tdActiveFrom.textContent = activeFromDate.toLocaleDateString('en-us', dateFormatOptions);
+                            tdActiveFrom.textContent = activeFromDate.toLocaleDateString('en-us', dateFormatOptions).replace(',', '');
                         } else {
                             tdActiveFrom.textContent = "N/A";
                         }
                         tr.appendChild(tdActiveFrom);
 
-                        // Create "Made Historic" cell, format example content "activeTo": "2015-02-12T22:40:57.522Z" to 2/12/2015 22:40:57
+                        // Create "Made Historic" cell, format example content "activeTo": "2015-02-12T22:40:57.522Z" to 02/12/2015 10:40:57 PM
                         var tdActiveTo = document.createElement("TD");
                         if (entity.activeTo) {
                             var activeToDate = new Date(entity.activeTo);
                             var dateFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-                            tdActiveTo.textContent = activeToDate.toLocaleDateString('en-us', dateFormatOptions);
+                            tdActiveTo.textContent = activeToDate.toLocaleDateString('en-us', dateFormatOptions).replace(',', '');
                         } else {
                             tdActiveTo.textContent = "N/A";
                         }
                         tr.appendChild(tdActiveTo);
-                        
+
 
                         // Append Completed new row to the in progress table body
                         tbody.appendChild(tr);
