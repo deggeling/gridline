@@ -26,7 +26,12 @@
                     var thInstallDate = document.createElement("TH");
                     thInstallDate.textContent = "Install Date";
                     tr.appendChild(thInstallDate);
-                                        
+
+                    // Create "Made Historic" header
+                    var thMadeHistoric = document.createElement("TH");
+                    thMadeHistoric.textContent = "Made Historic Date";
+                    tr.appendChild(thMadeHistoric);
+
                     // Append Completed Header row to the table
                     thead.appendChild(tr);
                     tableElement.appendChild(thead);
@@ -52,16 +57,28 @@
                         }
                         tr.appendChild(tdSerialNumber);
 
-
                         // Create ActiveFrom cell, format example content "activeFrom": "2015-02-12T22:40:57.522Z" to 2/12/2015 22:40:57
                         var tdActiveFrom = document.createElement("TD");
                         if (entity.activeFrom) {
                             var activeFromDate = new Date(entity.activeFrom);
-                            tdActiveFrom.textContent = (activeFromDate.getMonth() + 1) + "/" + activeFromDate.getDate() + "/" + activeFromDate.getFullYear() + " " + activeFromDate.getHours() + ":" + activeFromDate.getMinutes() + ":" + activeFromDate.getSeconds();
+                            var dateFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                            tdActiveFrom.textContent = activeFromDate.toLocaleDateString('en-us', options);
                         } else {
                             tdActiveFrom.textContent = "N/A";
                         }
                         tr.appendChild(tdActiveFrom);
+
+                        // Create "Made Historic" cell, format example content "activeTo": "2015-02-12T22:40:57.522Z" to 2/12/2015 22:40:57
+                        var tdActiveTo = document.createElement("TD");
+                        if (entity.activeTo) {
+                            var activeToDate = new Date(entity.activeTo);
+                            var dateFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                            tdActiveTo.textContent = activeToDate.toLocaleDateString('en-us', options);
+                        } else {
+                            tdActiveTo.textContent = "N/A";
+                        }
+                        tr.appendChild(tdActiveTo);
+                        
 
                         // Append Completed new row to the in progress table body
                         tbody.appendChild(tr);
@@ -74,7 +91,6 @@
                     var divElement = document.createElement("DIV");
                     divElement.className = "de-responsive-table";
                     divElement.appendChild(tableElement);
-
                     return divElement;
                 },
                 goToVehicles = function (event) {

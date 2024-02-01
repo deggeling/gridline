@@ -16,12 +16,12 @@
     font-size: 14px;
 }
 
-.de-responsive-table tr:hover {
-    background-color: #75787B;
-}
-
 .de-responsive-table tr:nth-child(even) {
     background-color: #f2f2f2;
+}
+
+.de-responsive-table tr:hover {
+    background-color: #75787B;
 }
 
 .de-responsive-table th {
