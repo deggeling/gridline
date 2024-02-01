@@ -22,7 +22,11 @@
                     thSerialNumber.textContent = "Serial Number";
                     tr.appendChild(thSerialNumber);
 
-                    
+                    // Create "Install Date" header
+                    var thInstallDate = document.createElement("TH");
+                    thInstallDate.textContent = "Install Date";
+                    tr.appendChild(thInstallDate);
+                                        
                     // Append Completed Header row to the table
                     thead.appendChild(tr);
                     tableElement.appendChild(thead);
@@ -48,11 +52,23 @@
                         }
                         tr.appendChild(tdSerialNumber);
 
+
+                        // Create ActiveFrom cell, format example content "activeFrom": "2015-02-12T22:40:57.522Z" to 2/12/2015 22:40:57
+                        var tdActiveFrom = document.createElement("TD");
+                        if (entity.activeFrom) {
+                            var activeFromDate = new Date(entity.activeFrom);
+                            tdActiveFrom.textContent = (activeFromDate.getMonth() + 1) + "/" + activeFromDate.getDate() + "/" + activeFromDate.getFullYear() + " " + activeFromDate.getHours() + ":" + activeFromDate.getMinutes() + ":" + activeFromDate.getSeconds();
+                        } else {
+                            tdActiveFrom.textContent = "N/A";
+                        }
+
+
+
                         // Append Completed new row to the in progress table body
                         tbody.appendChild(tr);
                     });
 
-                    // Append the output table body to the actual table element
+                    // Append the completed output table body to the actual table element
                     tableElement.appendChild(tbody);
 
                     // Create a div element and add the now completed table to it

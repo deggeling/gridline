@@ -16,6 +16,10 @@
     font-size: 14px;
 }
 
+.de-responsive-table tr:hover {
+    background-color: #75787B;
+}
+
 .de-responsive-table tr:nth-child(even) {
     background-color: #f2f2f2;
 }
@@ -48,6 +52,6 @@
 }
 
 #de_vehiclesButton.de-vehicles-button:hover {
-    background-color: #45a049;
+    background-color: #75787B;
     /* Green background on hover */
 }
