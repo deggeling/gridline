@@ -158,8 +158,11 @@
                         // Filter HOS Results to just Rejected before passing into tableCreator using extractValues function above
                         let filteredResult = result
                             .filter(r => {
-                                let comment = r.comment.toLowerCase().replaceAll(' ', '');
-                                return (!comment.includes('addedannotations')) && comment.includes('state:rejected');
+                                if (r.comment) {
+                                    let comment = r.comment.toLowerCase().replaceAll(' ', '');
+                                    return (!comment.includes('addedannotations')) && comment.includes('state:rejected');
+                                }
+                                return false; // If r.comment is undefined or null, do not include r in the filtered result
                             })
                             .map(r => {
                                 let info = extractValues(r.comment);
