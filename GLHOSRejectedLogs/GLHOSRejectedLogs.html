@@ -52,7 +52,7 @@
                         // Create "HOS Log Status" cell, if property doesnt exist on object, replace with N/A
                         //Will need to update this to the "parsed" Log status or limit entities coming in to only rejecteds
                         var tdLogStatus = document.createElement("TD");
-                        if (entity.comment.includes('addedannotations') && comment.includes('state:rejected')) { // Say Rejected or show full comment for now
+                        if (!entity.comment.includes('addedannotations') && comment.includes('state:rejected')) { // Say Rejected or show full comment for now
                             tdLogStatus.textContent = "REJECTED HOS LOG";
                         } else {
                             tdLogStatus.textContent = entity.comment;
