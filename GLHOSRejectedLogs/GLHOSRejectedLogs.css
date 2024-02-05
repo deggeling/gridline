@@ -29,7 +29,7 @@
     color: white;
 }
 
-#de_vehiclesButton.de-vehicles-button {
+#de_HOSLogsButton.de-HOSLogs-button {
     background-color: #ED8B00;
     /* Green background */
     border: none;
@@ -51,7 +51,7 @@
     /* Transition effect */
 }
 
-#de_vehiclesButton.de-vehicles-button:hover {
+#de_HOSLogsButton.de-HOSLogs-button:hover {
     background-color: #75787B;
     /* Green background on hover */
 }

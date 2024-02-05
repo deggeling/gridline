@@ -12,25 +12,25 @@
                     var tbody = document.createElement("TBODY");
                     var tr = document.createElement("TR");
 
-                    // Create "Name" header
-                    var th = document.createElement("TH");
-                    th.textContent = "Name";
-                    tr.appendChild(th);
+                    // Create "HOS log Status" header
+                    var th1 = document.createElement("TH");
+                    th1.textContent = "HOS Log Status";
+                    tr.appendChild(th1);
 
-                    // Create "Serial Number" header
-                    var thSerialNumber = document.createElement("TH");
-                    thSerialNumber.textContent = "Serial Number";
-                    tr.appendChild(thSerialNumber);
+                    // Create "Username" header
+                    var th2 = document.createElement("TH");
+                    th2.textContent = "User/Driver";
+                    tr.appendChild(th2);
 
-                    // Create "Install Date" header
-                    var thInstallDate = document.createElement("TH");
-                    thInstallDate.textContent = "Install Date (latest first)";
-                    tr.appendChild(thInstallDate);
+                    // Create "Rejected Date" header
+                    var th3 = document.createElement("TH");
+                    th3.textContent = "Rejected Date (Recent First)";
+                    tr.appendChild(th3);
 
-                    // Create "Made Historic" header
-                    var thMadeHistoric = document.createElement("TH");
-                    thMadeHistoric.textContent = "Made Historic Date";
-                    tr.appendChild(thMadeHistoric);
+                    // // Create "Made Historic" header
+                    // var th4 = document.createElement("TH");
+                    // th4.textContent = "Made Historic Date";
+                    // tr.appendChild(th4);
 
                     // Append Completed Headers row to the table
                     thead.appendChild(tr);
@@ -111,7 +111,7 @@
                 refreshPage = function () {
                     api.call("Get", {
                         typeName: "Device",
-                        resultsLimit: 10
+                        resultsLimit: 100
                     }, function (result) {
                         center.addEventListener("click", goToVehicles, false);
                         center.appendChild(tableCreator(result));
@@ -126,9 +126,9 @@
 
             return {
                 initialize: function (api, state, callback) {
-                    document.getElementById("de_vehiclesButton")
+                    document.getElementById("de_HOSLogsButton")
                         .addEventListener("click", function () {
-                            state.gotoPage("devices");
+                            state.gotoPage("hosLogs");
                         }, false);
                     callback();
                 },
@@ -145,7 +145,7 @@
 
 <body>
     <div id="center">
-        <button id="de_vehiclesButton" class="de-vehicles-button">Go to Assets page</button>
+        <button id="de_HOSLogsButton" class="de-HOSLogs-button">Go to HOS page</button>
     </div>
     <link rel="stylesheet" href="GLHOSRejectedLogs.css">
 </body>
