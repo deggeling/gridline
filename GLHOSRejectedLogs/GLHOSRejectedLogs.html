@@ -52,6 +52,7 @@
                         // Create "HOS Log Status" cell, if property doesnt exist on object, replace with N/A
                         //Will need to update this to the "parsed" Log status or limit entities coming in to only rejecteds
                         var tdLogStatus = document.createElement("TD");
+                        tdLogStatus.setAttribute("data-id", entity.ID);
                         if (!entity.comment.includes('addedannotations') && entity.comment.includes('state:rejected')) { // Say Rejected or show full comment for now
                             tdLogStatus.textContent = "REJECTED HOS LOG";
                         } else {
@@ -65,7 +66,6 @@
                         //this id will actually need to come from parsed ID out of audit comment section and go on the row or first column entry
                         var td = document.createElement("TD");
                         td.textContent = entity.userName;
-                        td.setAttribute("data-id", entity.id);
                         tr.appendChild(td);
 
 
@@ -106,10 +106,10 @@
                     divElement.appendChild(tableElement);
                     return divElement;
                 },
-                goToVehicles = function (event) {
+                goToHOSLogs = function (event) {
                     var id = event.target.getAttribute("data-id");
                     if (id) {
-                        state.gotoPage("device", {
+                        state.gotoPage("hosLog", {
                             id: id
                         });
                     }
@@ -124,14 +124,69 @@
                         },
                         resultsLimit: 10000
                     }, function (result) {
-                        center.addEventListener("click", goToVehicles, false);
-                        center.appendChild(tableCreator(result));
+
+                        // Function for parsing Audit Log HOS items and fields
+                        function extractValues(logString) {
+                            try {
+                                const idMatch = logString.match(/ID: ([\w\-]+)/);
+                                const stateMatch = logString.match(/State: (\w+)/);
+                                const statusMatch = logString.match(/Status: (\w+)/);
+                                const eventRecordStatusMatch = logString.match(/EventRecordStatus: (\d+)/);
+                                const driver = logString.match(/Driver: (\w+)/);
+                                const timestamp = logString.match(/Timestamp: (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)/);
+
+
+                                const extractResult = {
+                                    ID: idMatch ? idMatch[1] : undefined,
+                                    State: stateMatch ? stateMatch[1] : undefined,
+                                    Status: statusMatch ? statusMatch[1] : undefined,
+                                    EventRecordStatus: eventRecordStatusMatch ? parseInt(eventRecordStatusMatch[1], 10) : undefined,
+                                    Driver: driver ? driver[1] : undefined,
+                                    Timestamp: timestamp ? timestamp[1] : undefined
+                                };
+
+                                return extractResult;
+                            } catch (error) {
+                                console.error('Error parsing the log string', error);
+                                return null;
+                            }
+                        }
+
+                        // Add Eventer Listener to Parent Div to handle event delegation for any children in table with event.target.getAttribute("data-id") in listed function
+                        center.addEventListener("click", goToHOSLogs, false);
+
+                        // Filter HOS Results to just Rejected before passing into tableCreator using extractValues function above
+                        let filteredResult = result
+                            .filter(r => {
+                                let comment = r.comment.toLowerCase().replaceAll(' ', '');
+                                return (!comment.includes('addedannotations')) && comment.includes('state:rejected');
+                            })
+                            .map(r => {
+                                let info = extractValues(r.comment);
+                                if (info) {
+                                    let {
+                                        ID,
+                                        State,
+                                        Status,
+                                        EventRecordStatus,
+                                        Driver,
+                                        Timestamp
+                                    } = info;
+                                    console.log(`Driver:${Driver}, Timestamp:${Timestamp}, HOS Log ID:${ID}, State:${State}, Status:${Status}, EventRecordStatus:${EventRecordStatus}`);
+                                    return info; // return the info object to be included in the filteredResult array
+                                } else {
+                                    console.log('Error extracting info from comment:', r.comment);
+                                    return null;
+                                }
+                            });
+
+                        center.appendChild(tableCreator(filteredResult));
                     }, function (error) {
                         console.log(error.message);
                     });
                 },
                 clearOnLeaving = function () {
-                    center.removeEventListener("click", goToVehicles, false);
+                    center.removeEventListener("click", goToHOSLogs, false);
                     center.innerHTML = "";
                 };
 
@@ -155,8 +210,11 @@
 </head>
 
 <body>
-    <div id="center">
+    <div id="de-buttonContainer">
         <button id="de_HOSLogsButton" class="de-HOSLogs-button">Go to Geotab HOS Page</button>
+    </div>
+    <div id="center">
+
     </div>
     <link rel="stylesheet" href="GLHOSRejectedLogs.css">
 </body>
