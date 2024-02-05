@@ -176,7 +176,8 @@
                                         Timestamp
                                     } = info;
                                     console.log(`Driver:${Driver}, Timestamp:${Timestamp}, HOS Log ID:${ID}, State:${State}, Status:${Status}, EventRecordStatus:${EventRecordStatus}`);
-                                    return {...r, ...info}; // Merge the properties of r and info                                } else {
+                                    return { ...r, ...info }; // Merge the properties of r and info
+                                } else {
                                     console.log('Error extracting info from comment:', r.comment);
                                     return null;
                                 }
