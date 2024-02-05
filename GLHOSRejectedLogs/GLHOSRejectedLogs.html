@@ -43,20 +43,11 @@
                         return dateB - dateA; // sort in descending order
                     });
 
-                    console.log('Entities before ForEach in tableCreator :');
-                    console.log(entities);
-
 
                     // Create table rows and data entries out of API results object
                     entities.forEach(function (entity) {
                         // Create a new row for the entity
                         var tr = document.createElement("TR");
-
-
-                    console.log('Each Entity in ForEach before an includes replace text check :');
-                    console.log(entity);
-
-                        
 
                         // Create "HOS Log Status" cell, if property doesnt exist on object, replace with N/A
                         //Will need to update this to the "parsed" Log status or limit entities coming in to only rejecteds
@@ -133,9 +124,7 @@
                         },
                         resultsLimit: 10000
                     }, function (result) {
-                    console.log('Raw Audit Result :');
-                    console.log(result);
-                        
+
                         // Function for parsing Audit Log HOS items and fields
                         function extractValues(logString) {
                             try {
@@ -187,8 +176,7 @@
                                         Timestamp
                                     } = info;
                                     console.log(`Driver:${Driver}, Timestamp:${Timestamp}, HOS Log ID:${ID}, State:${State}, Status:${Status}, EventRecordStatus:${EventRecordStatus}`);
-                                    return info; // return the info object to be included in the filteredResult array
-                                } else {
+                                    return {...r, ...info}; // Merge the properties of r and info                                } else {
                                     console.log('Error extracting info from comment:', r.comment);
                                     return null;
                                 }
