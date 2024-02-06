@@ -63,7 +63,7 @@
                         tdLogStatus.setAttribute("data-id", entity.ID);
                         console.log(entity.comment);
                         if (!entity.comment.includes('Added Annotations') && entity.comment.includes('State: Rejected') && entity.comment.includes('Origin: Unassigned')) {
-                            tdLogStatus.textContent = "Rejected Back to Unassigned";
+                            tdLogStatus.textContent = "Rejected Back to Unidentified";
                         } else {
                             tdLogStatus.textContent = entity.comment;
                         }
