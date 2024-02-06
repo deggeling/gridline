@@ -12,22 +12,34 @@
                     var tbody = document.createElement("TBODY");
                     var tr = document.createElement("TR");
 
-                    // Create "HOS Log Status" header
+                    // Create "HOS Log Status" header, will be clickable column to go to HOS LOG ID, if exist
                     var th1 = document.createElement("TH");
                     th1.textContent = "HOS Log Status";
                     tr.appendChild(th1);
 
-                    // Create "Username" header
+                    // Create "Rejected Date" header
                     var th2 = document.createElement("TH");
-                    th2.textContent = "User/Driver";
+                    th2.textContent = "Rejected Date (Recent First)";
                     tr.appendChild(th2);
 
-                    // Create "Rejected Date" header
+                    // Create "Username" header
                     var th3 = document.createElement("TH");
-                    th3.textContent = "Rejected Date (Recent First)";
+                    th3.textContent = "User/Driver";
                     tr.appendChild(th3);
 
-                    // // Create "Made Historic" header
+                    // Create "Device" header
+                    var th4 = document.createElement("TH");
+                    th4.textContent = "Device";
+                    tr.appendChild(th4);
+
+                    // create a Date of HOS Log header
+                    var th5 = document.createElement("TH");
+                    th5.textContent = "Date of HOS Log";
+                    tr.appendChild(th5);
+
+
+
+                    // Create "Made Historic" header
                     // var th4 = document.createElement("TH");
                     // th4.textContent = "Made Historic Date";
                     // tr.appendChild(th4);
@@ -36,7 +48,7 @@
                     thead.appendChild(tr);
                     tableElement.appendChild(thead);
 
-                    // Sort entites before creating table rows in descending order (latest first)
+                    // Sort entites before creating table rows in descending order (latest first by order rejected)
                     entities.sort(function (a, b) {
                         var dateA = a.dateTime ? new Date(a.dateTime) : new Date(-8640000000000000);  //Earliest date in JS for no prop/no date
                         var dateB = b.dateTime ? new Date(b.dateTime) : new Date(-8640000000000000);
@@ -46,11 +58,10 @@
 
                     // Create table rows and data entries out of API results object
                     entities.forEach(function (entity) {
-                        // Create a new row for the entity
+                        // Create a new row for the entity and its shown details
                         var tr = document.createElement("TR");
 
-                        // Create "HOS Log Status" cell, if property doesnt exist on object, replace with N/A
-                        //Will need to update this to the "parsed" Log status or limit entities coming in to only rejecteds
+                        // Create "HOS Log Status" cell, ith a "data-id" attribute defined by its id for later onclicks on cell
                         var tdLogStatus = document.createElement("TD");
                         tdLogStatus.setAttribute("data-id", entity.ID);
                         if (!entity.comment.includes('addedannotations') && entity.comment.includes('state:rejected')) { // Say Rejected or show full comment for now
@@ -61,36 +72,41 @@
                         tr.appendChild(tdLogStatus);
 
 
-
-                        // Create "UserName/Driver" cell with an attribute defined by its id for later
-                        //this id will actually need to come from parsed ID out of audit comment section and go on the row or first column entry
-                        var td = document.createElement("TD");
-                        td.textContent = entity.userName;
-                        tr.appendChild(td);
-
-
-
-                        // Create dateTime cell, format example content "dateTime": "2015-02-12T22:40:57.522Z" to 02/12/2015 10:40:57 PM
-                        var tddateTime = document.createElement("TD");
+                        // Create "Rejected dateTime" cell, format example content "dateTime": "2015-02-12T22:40:57.522Z" to 02/12/2015 10:40:57 PM, convert to browser local TZ
+                        var tdDateTime = document.createElement("TD");
                         if (entity.dateTime) {
                             var dateTimeDate = new Date(entity.dateTime);
                             var dateFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-                            tddateTime.textContent = dateTimeDate.toLocaleDateString('en-us', dateFormatOptions).replace(',', '');
+                            tdDateTime.textContent = dateTimeDate.toLocaleDateString('en-us', dateFormatOptions).replace(',', '');
                         } else {
-                            tddateTime.textContent = "N/A";
+                            tdDateTime.textContent = "N/A";
                         }
-                        tr.appendChild(tddateTime);
+                        tr.appendChild(tdDateTime);
 
-                        // Create "Made Historic" cell, format example content "activeTo": "2015-02-12T22:40:57.522Z" to 02/12/2015 10:40:57 PM
-                        // var tdActiveTo = document.createElement("TD");
-                        // if (entity.activeTo) {
-                        //     var activeToDate = new Date(entity.activeTo);
-                        //     var dateFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-                        //     tdActiveTo.textContent = activeToDate.toLocaleDateString('en-us', dateFormatOptions).replace(',', '');
-                        // } else {
-                        //     tdActiveTo.textContent = "N/A";
-                        // }
-                        // tr.appendChild(tdActiveTo);
+
+                        // Create "UserName/Driver" cell
+                        var tdName = document.createElement("TD");
+                        tdName.textContent = entity.userName;
+                        tr.appendChild(tdName);
+
+
+                        // Create "Device" cell from parsed string entry
+                        var tdDevice = document.createElement("TD");
+                        tdDevice.textContent = "Placeholder";  //Placeholder needs the prop parsed added to entity from comment sting
+                        tr.appendChild(tdDevice);
+
+
+                        // Create "Date of HOS Log" cell, format to 02/12/2015 10:40:57 PM, convert to browser local TZ
+                        var tdTimestamp = document.createElement("TD");
+                        if (entity.Timestamp) {
+                            var dateTimeDate = new Date(entity.Timestamp);
+                            var dateFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                            tdTimestamp.textContent = dateTimeDate.toLocaleDateString('en-us', dateFormatOptions).replace(',', '');
+                        } else {
+                            tdTimestamp.textContent = "N/A";
+                        }
+                        tr.appendChild(tdTimestamp);
+
 
 
                         // Append Completed new row to the in progress table body
@@ -115,12 +131,19 @@
                     }
                 },
                 refreshPage = function () {
+                    //Get UTC date for right now and past 7 days (to and from dates) and convert to ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ)
+                    let now = new Date();
+                    let sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    let toDate = now.toISOString();
+                    let fromDate = sevenDaysAgo.toISOString();
+
+
                     api.call("Get", {
                         typeName: "Audit",
                         search: {
                             name: "HosLogEdit",
-                            fromDate: "2024-02-01T05:00:00.000Z",
-                            toDate: "2024-02-28T04:59:59.000Z"
+                            fromDate: fromDate,
+                            toDate: toDate
                         },
                         resultsLimit: 10000
                     }, function (result) {
@@ -215,6 +238,9 @@
 <body>
     <div id="de-buttonContainer">
         <button id="de_HOSLogsButton" class="de-HOSLogs-button">Go to Geotab HOS Page</button>
+    </div>
+    <div class="de-title-bar">
+        <h1>Gridline Rejected HOS Logs - Past 7 days</h1>
     </div>
     <div id="center">
 
