@@ -89,7 +89,7 @@
 
                         // Create "Device" cell from parsed string entry
                         var tdDevice = document.createElement("TD");
-                        tdDevice.textContent = "Placeholder";  //Placeholder needs the prop parsed added to entity from comment sting
+                        tdDevice.textContent = entity.Device;
                         tr.appendChild(tdDevice);
 
 
@@ -153,6 +153,7 @@
                                 const statusMatch = logString.match(/Status: (\w+)/);
                                 const eventRecordStatusMatch = logString.match(/EventRecordStatus: (\d+)/);
                                 const driver = logString.match(/Driver: (\w+)/);
+                                const deviceMatch = logString.match(/Device: ([\w-]+)/);
                                 const timestamp = logString.match(/Timestamp: (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)/);
 
 
@@ -162,6 +163,7 @@
                                     Status: statusMatch ? statusMatch[1] : undefined,
                                     EventRecordStatus: eventRecordStatusMatch ? parseInt(eventRecordStatusMatch[1], 10) : undefined,
                                     Driver: driver ? driver[1] : undefined,
+                                    Device: deviceMatch ? deviceMatch[1] : undefined,
                                     Timestamp: timestamp ? timestamp[1] : undefined
                                 };
 
@@ -193,9 +195,10 @@
                                         Status,
                                         EventRecordStatus,
                                         Driver,
+                                        Device,
                                         Timestamp
                                     } = info;
-                                    console.log(`Driver:${Driver}, Timestamp:${Timestamp}, HOS Log ID:${ID}, State:${State}, Status:${Status}, EventRecordStatus:${EventRecordStatus}`);
+                                    console.log(`Driver:${Driver}, Device:${Device}, Timestamp:${Timestamp}, HOS Log ID:${ID}, State:${State}, Status:${Status}, EventRecordStatus:${EventRecordStatus}`);
                                     return { ...r, ...info }; // Merge the properties of r and info
                                 } else {
                                     console.log('Error extracting info from comment:', r.comment);
