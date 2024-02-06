@@ -183,7 +183,7 @@
                             .filter(r => {
                                 if (r.comment) {
                                     let comment = r.comment.toLowerCase().replaceAll(' ', '');
-                                    return (!comment.includes('addedannotations')) && comment.includes('state:rejected');
+                                    return (!comment.includes('addedannotations')) && (comment.includes('state:rejected')||comment.includes('state:active'));
                                 }
                                 return false; // If r.comment is undefined or null, do not include r in the filtered result
                             })
