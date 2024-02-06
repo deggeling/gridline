@@ -111,7 +111,7 @@
                 refreshPage = function () {
                     api.call("Get", {
                         typeName: "Device",
-                        resultsLimit: 10
+                        resultsLimit: 500
                     }, function (result) {
                         center.addEventListener("click", goToVehicles, false);
                         center.appendChild(tableCreator(result));
