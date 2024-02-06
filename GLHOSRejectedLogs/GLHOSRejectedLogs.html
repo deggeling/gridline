@@ -38,6 +38,24 @@
                     tr.appendChild(th5);
 
 
+                    //create 3 placeholder headers for the 3 new columns to be filled in by second API call data details relation by LogID
+                    // create a "Manually Added By" header
+                    var th6 = document.createElement("TH");
+                    th6.textContent = "Manually Added By";
+                    tr.appendChild(th6);
+
+                    // Create a "Log Type" header
+                    var th7 = document.createElement("TH");
+                    th7.textContent = "Log Status Type";
+                    tr.appendChild(th7);
+
+                    // Create a Manually Added Date header
+                    var th8 = document.createElement("TH");
+                    th8.textContent = "Manually Added Date";
+                    tr.appendChild(th8);
+                    
+
+
                     // Append Completed Headers row to the table
                     thead.appendChild(tr);
                     tableElement.appendChild(thead);
@@ -105,8 +123,22 @@
                         }
                         tr.appendChild(tdTimestamp);
 
+                        //Create 3 Placeholder cells for the 3 new columns to be filled in by second API call data details relation by LogID
+                        // Create "Manually Added By" cell
+                        var tdManuallyAddedBy = document.createElement("TD");
+                        tdManuallyAddedBy.textContent = "Loading...";
+                        tr.appendChild(tdManuallyAddedBy);
+                        
+                        // Create "Log Type" cell
+                        var tdLogType = document.createElement("TD");
+                        tdLogType.textContent = "Loading...";
+                        tr.appendChild(tdLogType);
 
-
+                        // Create "Manually Added Date" cell
+                        var tdManuallyAddedDate = document.createElement("TD");
+                        tdManuallyAddedDate.textContent = "Loading...";
+                        tr.appendChild(tdManuallyAddedDate);
+                        
                         // Append Completed new row to the in progress table body
                         tbody.appendChild(tr);
                     });

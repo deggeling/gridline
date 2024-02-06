@@ -27,6 +27,10 @@
     font-size: 14px;
 }
 
+table td:first-child {
+    max-width: 20%;
+}
+
 .de-responsive-table tr:nth-child(even) {
     background-color: #f2f2f2;
 }
