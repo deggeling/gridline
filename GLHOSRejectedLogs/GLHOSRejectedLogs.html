@@ -61,8 +61,8 @@
                         // Create "HOS Log Status" cell, ith a "data-id" attribute defined by its id for later onclicks on cell
                         var tdLogStatus = document.createElement("TD");
                         tdLogStatus.setAttribute("data-id", entity.ID);
-                        if (!entity.comment.includes('addedannotations') && entity.comment.includes('state:rejected')) { // Say Rejected or show full comment for now
-                            tdLogStatus.textContent = "REJECTED HOS LOG";
+                        if (!entity.comment.includes('Added Annotations') && (entity.comment.includes('State: Rejected')&& entity.comment.includes('Origin: Unnasigned'))) { // Say Rejected or show full comment for now
+                            tdLogStatus.textContent = "Rejected Back to Unassigned";
                         } else {
                             tdLogStatus.textContent = entity.comment;
                         }
