@@ -62,7 +62,7 @@
                         var tdLogStatus = document.createElement("TD");
                         tdLogStatus.setAttribute("data-id", entity.ID);
                         console.log(entity.comment);
-                        if (entity.comment.includes('Added Annotations') && entity.comment.includes('State: Rejected') && entity.comment.includes('Origin: Unnasigned')) {
+                        if (!entity.comment.includes('Added Annotations') && entity.comment.includes('State: Rejected') && entity.comment.includes('Origin: Unnasigned')) {
                             tdLogStatus.textContent = "Rejected Back to Unassigned";
                         } else {
                             tdLogStatus.textContent = entity.comment;
