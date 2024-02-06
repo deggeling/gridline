@@ -1,9 +1,9 @@
 .de-title-bar {
     background-color: #ED8B00; /* Change to your preferred color */
     color: white; /* Change to your preferred color */
-    text-align: center;
-    padding: 10px;
-    font-size: 20px;
+    text-align: left;
+    padding: 4px;
+    font-size: 16px;
     font-weight: bold;
 }
 
@@ -27,6 +27,10 @@
 
 .de-responsive-table tr:nth-child(even) {
     background-color: #f2f2f2;
+}
+
+.de-responsive-table td:first-child, .de-responsive-table th:first-child {
+    cursor: pointer;
 }
 
 .de-responsive-table tr:hover {

@@ -38,15 +38,10 @@
                     tr.appendChild(th5);
 
 
-
-                    // Create "Made Historic" header
-                    // var th4 = document.createElement("TH");
-                    // th4.textContent = "Made Historic Date";
-                    // tr.appendChild(th4);
-
                     // Append Completed Headers row to the table
                     thead.appendChild(tr);
                     tableElement.appendChild(thead);
+
 
                     // Sort entites before creating table rows in descending order (latest first by order rejected)
                     entities.sort(function (a, b) {
@@ -58,8 +53,10 @@
 
                     // Create table rows and data entries out of API results object
                     entities.forEach(function (entity) {
+
                         // Create a new row for the entity and its shown details
                         var tr = document.createElement("TR");
+
 
                         // Create "HOS Log Status" cell, ith a "data-id" attribute defined by its id for later onclicks on cell
                         var tdLogStatus = document.createElement("TD");
@@ -116,7 +113,7 @@
                     // Append the completed output table body to the actual table element
                     tableElement.appendChild(tbody);
 
-                    // Create a div element and add the now completed table to it
+                    // Create a div element and add the now completed table element to it
                     var divElement = document.createElement("DIV");
                     divElement.className = "de-responsive-table";
                     divElement.appendChild(tableElement);
@@ -240,7 +237,7 @@
         <button id="de_HOSLogsButton" class="de-HOSLogs-button">Go to Geotab HOS Page</button>
     </div>
     <div class="de-title-bar">
-        <h1>Gridline Rejected HOS Logs - Past 7 days</h1>
+        <h1>Gridline Rejected HOS Logs - Past 7 Days</h1>
     </div>
     <div id="center">
 
