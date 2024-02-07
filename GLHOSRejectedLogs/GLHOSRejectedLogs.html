@@ -51,7 +51,7 @@
 
                     // Create a Manually Added Date header
                     var th8 = document.createElement("TH");
-                    th8.textContent = "Date Added or Edited";
+                    th8.textContent = "Date Added/Edited";
                     tr.appendChild(th8);
 
 
@@ -74,13 +74,16 @@
                         // Create a new row for the entity and its shown details
                         var tr = document.createElement("TR");
 
-
                         // Create "HOS Log Status" cell, ith a "data-id" attribute defined by its id for later onclicks on cell
                         var tdLogStatus = document.createElement("TD");
                         tdLogStatus.setAttribute("data-id", entity.ID);
                         console.log(entity.comment);
                         if (!entity.comment.includes('Added Annotations') && entity.comment.includes('State: Rejected') && entity.comment.includes('Origin: Unassigned')) {
-                            tdLogStatus.textContent = "Rejected Back to Unidentified";
+                            tdLogStatus.textContent = "REJECTED - Back to Unidentified"
+                        } else if (!entity.comment.includes('Added Annotations') && entity.comment.includes('State: Rejected')) {
+                            tdLogStatus.textContent = 'REJECTED - Manual Log Addition (no longer exists)';
+                        } else if (!entity.comment.includes('Added Annotations') && entity.comment.includes('State: Active')) {
+                            tdLogStatus.textContent = 'ACCEPTED - Driver Accepted Log';
                         } else {
                             tdLogStatus.textContent = entity.comment;
                         }
@@ -259,12 +262,12 @@
                                     const idMatch = logString.match(/ID: ([\w\-_]+),/);
                                     const statusMatch = logString.match(/Status: (\w+),/);
 
-                                    const  extractHOSAddResult = {
+                                    const extractHOSAddResult = {
                                         ID: idMatch ? idMatch[1] : undefined,
                                         Status: statusMatch ? statusMatch[1] : undefined
                                     };
                                     //temp console log the logstring
-                                    console.log("HOS ADD comment", logString);                              
+                                    console.log("HOS ADD comment", logString);
 
                                     return extractHOSAddResult;
                                 } catch (error) {
@@ -355,7 +358,7 @@
 
 <body>
     <div id="de-buttonContainer">
-        <button id="de_HOSLogsButton" class="de-HOSLogs-button">Go to Geotab HOS Page</button>
+        <button id="de_HOSLogsButton" class="de-HOSLogs-button">To Geotab HOS Logs</button>
     </div>
     <div class="de-title-bar">
         <h1>Gridline Rejected HOS Logs - Past 7 Days</h1>
