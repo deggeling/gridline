@@ -53,7 +53,7 @@
                     var th8 = document.createElement("TH");
                     th8.textContent = "Manually Added Date";
                     tr.appendChild(th8);
-                    
+
 
 
                     // Append Completed Headers row to the table
@@ -123,12 +123,13 @@
                         }
                         tr.appendChild(tdTimestamp);
 
-                        //Create 3 Placeholder cells for the 3 new columns to be filled in by second API call data details relation by LogID
+
+                        //Create 3 Placeholder cells for the 3 new columns to be filled in by second API call data details relation by LogID "data-id" of the row
                         // Create "Manually Added By" cell
                         var tdManuallyAddedBy = document.createElement("TD");
                         tdManuallyAddedBy.textContent = "Loading...";
                         tr.appendChild(tdManuallyAddedBy);
-                        
+
                         // Create "Log Type" cell
                         var tdLogType = document.createElement("TD");
                         tdLogType.textContent = "Loading...";
@@ -138,7 +139,7 @@
                         var tdManuallyAddedDate = document.createElement("TD");
                         tdManuallyAddedDate.textContent = "Loading...";
                         tr.appendChild(tdManuallyAddedDate);
-                        
+
                         // Append Completed new row to the in progress table body
                         tbody.appendChild(tr);
                     });
@@ -178,7 +179,7 @@
                         resultsLimit: 10000
                     }, function (result) {
 
-                        // Function for parsing Audit Log HOS items and fields
+                        // Function for parsing Audit EDIT Log HOS items and fields
                         function extractValues(logString) {
                             try {
                                 const idMatch = logString.match(/ID: ([\w\-]+)/);
@@ -215,7 +216,7 @@
                             .filter(r => {
                                 if (r.comment) {
                                     let comment = r.comment.toLowerCase().replaceAll(' ', '');
-                                    return (!comment.includes('addedannotations')) && (comment.includes('state:rejected')||comment.includes('state:active'));
+                                    return (!comment.includes('addedannotations')) && (comment.includes('state:rejected') || comment.includes('state:active'));
                                 }
                                 return false; // If r.comment is undefined or null, do not include r in the filtered result
                             })
@@ -240,6 +241,105 @@
                             });
 
                         center.appendChild(tableCreator(filteredResult));
+                        //HOS EDITS NOW COMPLETED AND TABLE BUILT
+
+
+                        //                           NEW HOS ADD SECTION
+
+
+                        //After table created with placeholders for HOS ADD Audit entries in place and HOS EDIT Table is filled
+                        // get the HOS ADD results to filter and parse and match back up to "data-id" rows
+                        api.call("Get", {
+                            typeName: "Audit",
+                            search: {
+                                name: "HosLogAdd",
+                                fromDate: fromDate,
+                                toDate: toDate
+                            },
+                            resultsLimit: 10000
+                        }, function (result) {
+                            //function to parse HOS ADD comment
+                            function extractValuesFromAddHOS(logString) {
+                                try {
+                                    const idMatch = logString.match(/ID: (\w+),/);
+                                    const statusMatch = logString.match(/Status: (\w+),/);
+
+                                    const  extractHOSAddResult = {
+                                        ID: idMatch ? idMatch[1] : undefined,
+                                        Status: statusMatch ? statusMatch[1] : undefined
+                                    };
+
+                                    return extractHOSAddResult;
+                                } catch (error) {
+                                    console.error('Error parsing the HOS ADD log string', error);
+                                    return null;
+                                }
+                            }
+
+                            // Filter HOS Results to just Other Authenticate User Adds 
+                            let filteredResult = result
+                                .filter(r => {
+                                    if (r.comment) {
+                                        let comment = r.comment.toLowerCase().replaceAll(' ', '');
+                                        return (comment.includes('origin:otherauthenticateduser'));
+                                    }
+                                    return false; // If r.comment is undefined or null, do not include r in the filtered result
+                                })
+                                .map(r => {
+                                    let info = extractValuesFromAddHOS(r.comment);
+                                    if (info) {
+                                        let {
+                                            ID,
+                                            Status,
+                                        } = info;
+                                        console.log(`HOS ADD COMMENT - ID:${ID}, Status:${Status}`);
+                                        return { ...r, ...info }; // Merge the properties of r and info
+                                    } else {
+                                        console.log('Error extracting info from HOS ADD comment:', r.comment);
+                                        return null;
+                                    }
+                                });
+
+                            // Get the Existing Edit HOS table rows and iterate through them to match up the HOS ADD results to the "data-id" rows
+                            let tableRows = center.getElementsByTagName("tr");
+                            for (let i = 0; i < tableRows.length; i++) {
+                                let row = tableRows[i];
+                                let id = row.getElementsByTagName("td")[0].getAttribute("data-id");
+                                let matchingAdd = filteredResult.find(r => r.ID === id);
+                                if (matchingAdd) {
+                                    let {
+                                        userName,
+                                        Status,
+                                        dateTime
+                                    } = matchingAdd;
+                                    let tdManuallyAddedBy = row.getElementsByTagName("td")[5];
+                                    let tdLogType = row.getElementsByTagName("td")[6];
+                                    let tdManuallyAddedDate = row.getElementsByTagName("td")[7];
+                                    tdManuallyAddedBy.textContent = userName;
+                                    tdLogType.textContent = Status;
+
+                                    // Convert the dateTime property to a friendly format
+                                    let date = new Date(dateTime);
+                                    let options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                                    tdManuallyAddedDate.textContent = date.toLocaleDateString('en-US', options);
+                                }
+                            }
+                        }, function (error) {
+                            console.log(error.message);
+                        });
+
+
+
+
+
+
+
+
+
+
+
+
+
                     }, function (error) {
                         console.log(error.message);
                     });
