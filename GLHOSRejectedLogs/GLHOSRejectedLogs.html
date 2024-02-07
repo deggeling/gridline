@@ -19,7 +19,7 @@
 
                     // Create "Rejected Date" header
                     var th2 = document.createElement("TH");
-                    th2.textContent = "Rejected Date (Recent First)";
+                    th2.textContent = "Rejected/Accepted Date (Recent First)";
                     tr.appendChild(th2);
 
                     // Create "Username" header
@@ -29,7 +29,7 @@
 
                     // Create "Device" header
                     var th4 = document.createElement("TH");
-                    th4.textContent = "Device";
+                    th4.textContent = "Vehicle"
                     tr.appendChild(th4);
 
                     // create a Date of HOS Log header
@@ -38,10 +38,10 @@
                     tr.appendChild(th5);
 
 
-                    //create 3 placeholder headers for the 3 new columns to be filled in by second API call data details relation by LogID
+                    // create 3 placeholder headers for the 3 new columns to be filled in by second API call data details relation by LogID
                     // create a "Manually Added By" header
                     var th6 = document.createElement("TH");
-                    th6.textContent = "Manually Added By";
+                    th6.textContent = "Manually Added/Edited By";
                     tr.appendChild(th6);
 
                     // Create a "Log Type" header
@@ -51,9 +51,8 @@
 
                     // Create a Manually Added Date header
                     var th8 = document.createElement("TH");
-                    th8.textContent = "Manually Added Date";
+                    th8.textContent = "Date Added or Edited";
                     tr.appendChild(th8);
-
 
 
                     // Append Completed Headers row to the table
@@ -61,7 +60,7 @@
                     tableElement.appendChild(thead);
 
 
-                    // Sort entites before creating table rows in descending order (latest first by order rejected)
+                    // Sort entites before creating table rows in descending order (latest first by order rejected/accepted)
                     entities.sort(function (a, b) {
                         var dateA = a.dateTime ? new Date(a.dateTime) : new Date(-8640000000000000);  //Earliest date in JS for no prop/no date
                         var dateB = b.dateTime ? new Date(b.dateTime) : new Date(-8640000000000000);
@@ -241,13 +240,9 @@
                             });
 
                         center.appendChild(tableCreator(filteredResult));
-                        //HOS EDITS NOW COMPLETED AND TABLE BUILT
+                        //HOS EDITS API NOW COMPLETED AND TABLE BUILT
 
-
-                        //                           NEW HOS ADD SECTION
-
-
-                        //After table created with placeholders for HOS ADD Audit entries in place and HOS EDIT Table is filled
+                        // After table created with placeholders for HOS ADD Audit entries in place and HOS EDIT Table is filled
                         // get the HOS ADD results to filter and parse and match back up to "data-id" rows
                         api.call("Get", {
                             typeName: "Audit",
@@ -258,16 +253,18 @@
                             },
                             resultsLimit: 10000
                         }, function (result) {
-                            //function to parse HOS ADD comment
+                            //function to parse HOS ADD comment HOS log ID and Log Status
                             function extractValuesFromAddHOS(logString) {
                                 try {
-                                    const idMatch = logString.match(/ID: (\w+),/);
+                                    const idMatch = logString.match(/ID: ([\w\-_]+),/);
                                     const statusMatch = logString.match(/Status: (\w+),/);
 
                                     const  extractHOSAddResult = {
                                         ID: idMatch ? idMatch[1] : undefined,
                                         Status: statusMatch ? statusMatch[1] : undefined
                                     };
+                                    //temp console log the logstring
+                                    console.log("HOS ADD comment", logString);                              
 
                                     return extractHOSAddResult;
                                 } catch (error) {
@@ -328,19 +325,6 @@
                         }, function (error) {
                             console.log(error.message);
                         });
-
-
-
-
-
-
-
-
-
-
-
-
-
                     }, function (error) {
                         console.log(error.message);
                     });
