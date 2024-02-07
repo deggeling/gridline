@@ -302,7 +302,8 @@
 
                             // Get the Existing Edit HOS table rows and iterate through them to match up the HOS ADD results to the "data-id" rows
                             let tableRows = center.getElementsByTagName("tr");
-                            for (let i = 0; i < tableRows.length; i++) {
+                            for (let i = 1; i < tableRows.length; i++) {
+                                //first row is actually headers row so starting loop at 1
                                 let row = tableRows[i];
                                 let id = row.getElementsByTagName("td")[0].getAttribute("data-id");
                                 let matchingAdd = filteredResult.find(r => r.ID === id);
