@@ -246,7 +246,78 @@
                         center.appendChild(tableCreator(filteredResult));
                         //HOS EDITS API NOW COMPLETED AND TABLE BUILT
 
-                        // After table created with placeholders for HOS ADD Audit entries in place and HOS EDIT Table is filled
+
+
+
+                        // parse another managerFilteredResult to match up to the existing "data-id" rows and fill ID
+                        function extractValuesfromManagerEdit(logString) {
+                            try {
+                                const idMatch = logString.match(/ID: ([\w\-_]+),/);
+
+                                const extractManagerEditResult = {
+                                    ID: idMatch ? idMatch[1] : undefined
+                                };
+                                //temp console log the logstring
+                                console.log("HOS Manager EDIT comment ID", logString);
+
+                                return extractManagerEditResult;
+                            } catch (error) {
+                                console.error('Error parsing the HOS Manager EDIT log string', error);
+                                return null;
+                            }
+                        }
+
+                        let managerFilteredResult = result
+                            .filter(r => {
+                                if (r.comment) {
+                                    let comment = r.comment.toLowerCase().replaceAll(' ', '');
+                                    return (comment.includes('state:requested') && comment.includes('origin:unassigned'));
+                                }
+                                return false; // If r.comment is undefined or null, do not include r in the filtered result
+                            })
+                            .map(r => {
+                                let info = extractValuesfromManagerEdit(r.comment);
+                                if (info) {
+                                    let {
+                                        ID
+                                    } = info;
+                                    console.log(`Unassigned Manager edit ID:${ID}`);
+                                    return { ...r, ...info }; // Merge the properties of r and info
+                                } else {
+                                    console.log('Error extracting info from comment:', r.comment);
+                                    return null;
+                                }
+                            });
+
+                         // look over the existing rows to fill in manager unassigned edits data   
+                        let tableRows = center.getElementsByTagName("tr");
+                        for (let i = 1; i < tableRows.length; i++) {
+                            //first row is actually headers row so starting loop at 1
+                            let row = tableRows[i];
+                            let id = row.getElementsByTagName("td")[0].getAttribute("data-id");
+                            let matchingAdd = managerFilteredResult.find(r => r.ID === id);
+                            if (matchingAdd) {
+                                let {
+                                    userName,
+                                    dateTime
+                                } = matchingAdd;
+                                let tdManuallyAddedBy = row.getElementsByTagName("td")[5];
+                                let tdLogType = row.getElementsByTagName("td")[6];
+                                let tdManuallyAddedDate = row.getElementsByTagName("td")[7];
+                                tdManuallyAddedBy.textContent = userName;
+                                tdLogType.textContent = "Auto Created Log";
+                                // Convert the dateTime property to a friendly format for ManuallyAddedDate
+                                let date = new Date(dateTime);
+                                let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                                tdManuallyAddedDate.textContent = date.toLocaleDateString('en-US', options).replace(',', '');
+                            }
+                        }
+
+
+
+
+
+                        // After table created with placeholders for HOS ADD Audit entries in place and HOS EDIT Table is filled and modified with edit additional manager data
                         // get the HOS ADD results to filter and parse and match back up to "data-id" rows
                         api.call("Get", {
                             typeName: "Audit",
@@ -362,7 +433,7 @@
         <button id="de_HOSLogsButton" class="de-HOSLogs-button">To Geotab HOS Logs</button>
     </div>
     <div class="de-title-bar">
-        <h1>Gridline Rejected HOS Logs - Past 7 Days</h1>
+        <h1>Gridline Accepted/Rejected HOS Logs - Past 7 Days</h1>
     </div>
     <div id="center">
 
