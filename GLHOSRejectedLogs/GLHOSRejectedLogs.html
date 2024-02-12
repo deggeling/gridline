@@ -164,6 +164,28 @@
                         });
                     }
                 },
+                exportToCSV = function () {
+                    let headers = Array.from(document.querySelectorAll('.de-responsive-table table th')).map(th => th.textContent);
+                    let rows = Array.from(document.querySelectorAll('.de-responsive-table table tr')).slice(1); // Exclude header row
+                    let data = rows.map(row => Array.from(row.querySelectorAll('td')).map(td => td.textContent));
+
+                    let csvContent = headers.join(',') + '\n' + data.map(e => e.join(',')).join('\n');
+
+                    let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    let url = URL.createObjectURL(blob);
+                    let link = document.createElement("a");
+                    link.setAttribute("href", url);
+                    let filedate = new Date();
+                    let fileyear = date.getFullYear();
+                    let filemonth = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based in JavaScript
+                    let fileday = date.getDate().toString().padStart(2, '0');
+                    let filename = fileyear + filemonth + fileday + ' AcceptedRejectedLogs.csv';
+                    link.setAttribute("download", filename);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                },
                 refreshPage = function () {
                     //Get UTC date for right now and past 7 days (to and from dates) and convert to ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ)
                     let now = new Date();
@@ -289,7 +311,7 @@
                                 }
                             });
 
-                         // look over the existing rows to fill in manager unassigned edits data   
+                        // look over the existing rows to fill in manager unassigned edits data   
                         let tableRows = center.getElementsByTagName("tr");
                         for (let i = 1; i < tableRows.length; i++) {
                             //first row is actually headers row so starting loop at 1
@@ -406,6 +428,7 @@
                 },
                 clearOnLeaving = function () {
                     center.removeEventListener("click", goToHOSLogs, false);
+                    document.getElementById('de_ExportButton').removeEventListener('click', exportToCSV);
                     center.innerHTML = "";
                 };
 
@@ -415,6 +438,7 @@
                         .addEventListener("click", function () {
                             state.gotoPage("hosLogs");
                         }, false);
+                    document.getElementById('de_ExportButton').addEventListener('click', exportToCSV);
                     callback();
                 },
                 focus: function (api, state) {
@@ -431,6 +455,7 @@
 <body>
     <div id="de-buttonContainer">
         <button id="de_HOSLogsButton" class="de-HOSLogs-button">To Geotab HOS Logs</button>
+        <button id="de_ExportButton" class="de-Export-button">Export to CSV</button>
     </div>
     <div class="de-title-bar">
         <h1>Gridline Accepted/Rejected HOS Logs - Past 7 Days</h1>
