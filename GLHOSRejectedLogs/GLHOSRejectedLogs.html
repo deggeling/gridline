@@ -176,9 +176,9 @@
                     let link = document.createElement("a");
                     link.setAttribute("href", url);
                     let filedate = new Date();
-                    let fileyear = date.getFullYear();
-                    let filemonth = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based in JavaScript
-                    let fileday = date.getDate().toString().padStart(2, '0');
+                    let fileyear = filedate.getFullYear();
+                    let filemonth = (filedate.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based in JavaScript
+                    let fileday = filedate.getDate().toString().padStart(2, '0');
                     let filename = fileyear + filemonth + fileday + ' AcceptedRejectedLogs.csv';
                     link.setAttribute("download", filename);
                     link.style.visibility = 'hidden';
