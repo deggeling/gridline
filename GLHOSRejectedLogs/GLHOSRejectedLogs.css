@@ -22,18 +22,11 @@
 .de-responsive-table th,
 .de-responsive-table td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 5px;
     text-align: left;
     font-size: 14px;
 }
 
-table td:first-child {
-    max-width: 20%;
-}
-
-.de-responsive-table tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
 
 .de-responsive-table td:first-child, .de-responsive-table th:first-child {
     cursor: pointer;
