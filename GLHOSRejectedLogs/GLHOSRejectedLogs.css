@@ -45,6 +45,11 @@
     border-bottom: 2px solid #4CAF50;
 }
 
+#de-buttonContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
 #de_HOSLogsButton.de-HOSLogs-button {
     background-color: #75787B;
     /* Green background */
@@ -70,4 +75,11 @@
 #de_HOSLogsButton.de-HOSLogs-button:hover {
     background-color: #ED8B00;
     /* Green background on hover */
+}
+
+input[type="date"] {
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 16px;
 }
