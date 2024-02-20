@@ -2,7 +2,9 @@
 <html>
 
 <head>
-    <title>Gridline HOS Rejected Logs</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gridline HOS Accpted or Rejected Logs</title>
     <script>
         geotab.addin.GLHOSRejectedLogs = function (api, state) {
             var center = document.getElementById("center"),
@@ -192,7 +194,7 @@
                 refreshPage = function () {
                     //Get UTC date for right now and past 7 days (to and from dates) and convert to ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ)
                     let now = new Date();
-                    let sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    let sevenDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
                     let toDate = now.toISOString();
                     let fromDate = sevenDaysAgo.toISOString();
                     // date picker defaults
@@ -218,7 +220,7 @@
                             fromDate: fromDate,
                             toDate: toDate
                         },
-                        resultsLimit: 10000
+                        resultsLimit: 30000
                     }, function (result) {
 
                         // Function for parsing Audit EDIT Log HOS items and fields
@@ -365,7 +367,7 @@
                                 fromDate: fromDate,
                                 toDate: toDate
                             },
-                            resultsLimit: 10000
+                            resultsLimit: 30000
                         }, function (result) {
                             //function to parse HOS ADD comment HOS log ID and Log Status
                             function extractValuesFromAddHOS(logString) {

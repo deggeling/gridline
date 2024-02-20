@@ -95,6 +95,7 @@
 input[type="date"] {
     border: 1px solid #ccc;
     padding: 5px;
+    margin-right: 10px;
     border-radius: 4px;
     font-size: 14px;
 }
