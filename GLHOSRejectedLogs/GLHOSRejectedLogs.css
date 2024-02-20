@@ -1,6 +1,8 @@
 .de-title-bar {
-    background-color: #ED8B00; /* Change to your preferred color */
-    color: white; /* Change to your preferred color */
+    background-color: #ED8B00;
+    /* Change to your preferred color */
+    color: white;
+    /* Change to your preferred color */
     text-align: left;
     padding: 4px;
     font-size: 16px;
@@ -28,7 +30,8 @@
 }
 
 
-.de-responsive-table td:first-child, .de-responsive-table th:first-child {
+.de-responsive-table td:first-child,
+.de-responsive-table th:first-child {
     cursor: pointer;
 }
 
@@ -79,9 +82,19 @@
     /* Green background on hover */
 }
 
+.de-datePickerContainer {
+    display: flex;
+    align-items: center;
+}
+
+.date-picker-label {
+    margin-right: 10px;
+    font-size: 14px;
+}
+
 input[type="date"] {
     border: 1px solid #ccc;
     padding: 5px;
     border-radius: 4px;
-    font-size: 16px;
+    font-size: 14px;
 }

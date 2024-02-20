@@ -472,11 +472,13 @@
 <body>
     <div id="de-buttonContainer">
         <button id="de_HOSLogsButton" class="de-HOSLogs-button">To Geotab HOS Logs</button>
-        <label for="fromDate">From:</label>
-        <input type="date" id="fromDate" name="fromDate">
-        <label for="toDate">To:</label>
-        <input type="date" id="toDate" name="toDate">
-        <button id="refreshDataButton">Refresh Data</button>
+        <div class="de-datePickerContainer">
+            <label class="date-picker-label" for="fromDate">From :</label>
+            <input type="date" id="fromDate" name="fromDate">
+            <label class="date-picker-label" for="toDate">To :</label>
+            <input type="date" id="toDate" name="toDate">
+            <button id="refreshDataButton">Refresh Data</button>
+        </div>
         <button id="de_ExportButton" class="de-Export-button">Export to CSV</button>
     </div>
     <div class="de-title-bar">
