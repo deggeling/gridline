@@ -182,7 +182,7 @@
                     let fileyear = filedate.getFullYear();
                     let filemonth = (filedate.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based in JavaScript
                     let fileday = filedate.getDate().toString().padStart(2, '0');
-                    let filename = fileyear + filemonth + fileday + ' AcceptedRejectedLogs.csv';
+                    let filename = 'GL_AcceptedRejectedLogs' + fileyear + filemonth + fileday + '.csv';
                     link.setAttribute("download", filename);
                     link.style.visibility = 'hidden';
                     document.body.appendChild(link);
@@ -195,6 +195,20 @@
                     let sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
                     let toDate = now.toISOString();
                     let fromDate = sevenDaysAgo.toISOString();
+                    // date picker defaults
+                    // Format dates as "YYYY-MM-DD" as the date picker expects for values
+                    let pickertoDate = now.toISOString().split('T')[0];
+                    let pickerfromDate = sevenDaysAgo.toISOString().split('T')[0];
+                    document.getElementById('fromDate').value = pickerfromDate;
+                    document.getElementById('toDate').value = pickertoDate;
+                    document.getElementById('toDate').max = pickertoDate;
+
+                    //testing refreshDataButton Listener
+                    document.getElementById('refreshDataButton').addEventListener('click', function () {
+                        var formattedFromDate = new Date(document.getElementById('fromDate').value).toISOString();
+                        var formattedToDate = new Date(document.getElementById('toDate').value).toISOString();
+                        console.log('formattedFromDate on click : ' + formattedFromDate + '  formattedToDate on click : ' + formattedToDate);
+                    });
 
 
                     api.call("Get", {
@@ -458,8 +472,11 @@
 <body>
     <div id="de-buttonContainer">
         <button id="de_HOSLogsButton" class="de-HOSLogs-button">To Geotab HOS Logs</button>
+        <label for="fromDate">From:</label>
         <input type="date" id="fromDate" name="fromDate">
+        <label for="toDate">To:</label>
         <input type="date" id="toDate" name="toDate">
+        <button id="refreshDataButton">Refresh Data</button>
         <button id="de_ExportButton" class="de-Export-button">Export to CSV</button>
     </div>
     <div class="de-title-bar">
