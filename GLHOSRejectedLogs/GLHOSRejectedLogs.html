@@ -445,12 +445,12 @@
                                 }
                                 // check final contents for leftover "Loading..." Cells in Manually Added/Edited By as they are just Engine Power Up/Down Auto logs not to be shown
                                 let finalcheckcell = row.getElementsByTagName("td")[5];
-                                if (cefinalcheckcelll.innerText === "Loading...") {
+                                if (finalcheckcell.innerText === "Loading...") {
                                     row.parentNode.removeChild(row);
                                     i--; // IMPORTANT Decrement the counter as the rows list is now shorter
                                 }
                             }
-                            
+
                         }, function (error) {
                             console.log(error.message);
                         });
