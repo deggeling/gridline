@@ -1,12 +1,21 @@
 .de-title-bar {
     background-color: #ED8B00;
-    /* Change to your preferred color */
     color: white;
-    /* Change to your preferred color */
     text-align: left;
     padding: 4px;
     font-size: 16px;
     font-weight: bold;
+}
+
+.de-title-bar .de-searchBox {
+    padding: 5px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+
+.center {
+    padding: 5px;
 }
 
 .de-responsive-table {
@@ -98,4 +107,19 @@ input[type="date"] {
     margin-right: 10px;
     border-radius: 4px;
     font-size: 14px;
+}
+
+#refreshDataButton {
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+    transition-duration: 0.4s;
+}
+
+#refreshDataButton:hover {
+    background-color: #ED8B00;
+    color: white;
 }

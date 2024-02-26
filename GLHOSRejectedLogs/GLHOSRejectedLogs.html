@@ -465,7 +465,7 @@
                     searchinput.addEventListener('keyup', function () {
                         let filter = searchinput.value.toUpperCase();
 
-                        for (let i = 0; i < searchTableRows.length; i++) {
+                        for (let i = 1; i < searchTableRows.length; i++) {
                             let cells = searchTableRows[i].getElementsByTagName('td');
 
                             let match = Array.from(cells).some(cell => cell.innerText.toUpperCase().includes(filter));
