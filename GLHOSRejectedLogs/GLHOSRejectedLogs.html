@@ -8,6 +8,8 @@
     <script>
         geotab.addin.GLHOSRejectedLogs = function (api, state) {
             var center = document.getElementById("center"),
+
+                //Table Creator function called after entities are filtered and grabbed by default pull
                 tableCreator = function (entities) {
                     var tableElement = document.createElement("TABLE");
                     var thead = document.createElement("THEAD");
@@ -53,7 +55,7 @@
 
                     // Create a Manually Added Date header
                     var th8 = document.createElement("TH");
-                    th8.textContent = "Date Added/Edited";
+                    th8.textContent = "Latest Added/Edited";
                     tr.appendChild(th8);
 
 
@@ -160,6 +162,8 @@
                     divElement.appendChild(tableElement);
                     return divElement;
                 },
+
+                //Function for the Go to HOS logs button, gets context of what cell is clicked for which LOG ID and ignores where link wouldn't exist in system
                 goToHOSLogs = function (event) {
                     var id = event.target.getAttribute("data-id");
                     var textContent = event.target.textContent;
@@ -169,6 +173,8 @@
                         });
                     }
                 },
+
+                //Function to grab and export current table structure to CSV triggered on export button click
                 exportToCSV = function () {
                     let headers = Array.from(document.querySelectorAll('.de-responsive-table table th')).map(th => th.textContent);
                     let rows = Array.from(document.querySelectorAll('.de-responsive-table table tr')).slice(1); // Exclude header row
@@ -437,7 +443,14 @@
                                     let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
                                     tdManuallyAddedDate.textContent = date.toLocaleDateString('en-US', options).replace(',', '');
                                 }
+                                // check final contents for leftover "Loading..." Cells in Manually Added/Edited By as they are just Engine Power Up/Down Auto logs not to be shown
+                                let finalcheckcell = row.getElementsByTagName("td")[5];
+                                if (cefinalcheckcelll.innerText === "Loading...") {
+                                    row.parentNode.removeChild(row);
+                                    i--; // IMPORTANT Decrement the counter as the rows list is now shorter
+                                }
                             }
+                            
                         }, function (error) {
                             console.log(error.message);
                         });
@@ -445,6 +458,8 @@
                         console.log(error.message);
                     });
                 },
+
+                //Function to cleanup event listeners and remove the center div inner html when "blur" or in otherwords when user navigates away from addin page
                 clearOnLeaving = function () {
                     center.removeEventListener("click", goToHOSLogs, false);
                     document.getElementById('de_ExportButton').removeEventListener('click', exportToCSV);
