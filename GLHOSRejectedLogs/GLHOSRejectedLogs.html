@@ -460,21 +460,20 @@
 
                     //attempt at searchable table listener after full table created
                     let searchinput = document.getElementById('de-searchInput');
-                    let table = document.querySelector('.de-responsive-table table');
+                    let searchTableRows = center.getElementsByTagName("tr");
 
                     searchinput.addEventListener('keyup', function () {
                         let filter = searchinput.value.toUpperCase();
-                        let rows = table.getElementsByTagName('tr');
 
-                        for (let i = 0; i < rows.length; i++) {
-                            let cells = rows[i].getElementsByTagName('td');
+                        for (let i = 0; i < searchTableRows.length; i++) {
+                            let cells = searchTableRows[i].getElementsByTagName('td');
 
                             let match = Array.from(cells).some(cell => cell.innerText.toUpperCase().includes(filter));
 
                             if (match) {
-                                rows[i].style.display = "";
+                                searchTableRows[i].style.display = "";
                             } else {
-                                rows[i].style.display = "none";
+                                searchTableRows[i].style.display = "none";
                             }
                         }
                     });
