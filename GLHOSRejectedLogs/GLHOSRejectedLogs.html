@@ -443,7 +443,7 @@
                                     let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
                                     tdManuallyAddedDate.textContent = date.toLocaleDateString('en-US', options).replace(',', '');
                                 }
-                                // check final contents for leftover "Loading..." Cells in Manually Added/Edited By as they are just Engine Power Up/Down Auto logs not to be shown
+                                // check final contents for leftover "Loading..." Cells in "Manually Added/Edited By" on resulting table as they are just Engine Power Up/Down Auto logs not to be shown
                                 let finalcheckcell = row.getElementsByTagName("td")[5];
                                 if (finalcheckcell.innerText === "Loading...") {
                                     row.parentNode.removeChild(row);
@@ -457,6 +457,28 @@
                     }, function (error) {
                         console.log(error.message);
                     });
+
+                    //attempt at searchable table listener after full table created
+                    let searchinput = document.getElementById('de-searchInput');
+                    let table = document.querySelector('.de-responsive-table table');
+
+                    searchinput.addEventListener('keyup', function () {
+                        let filter = searchinput.value.toUpperCase();
+                        let rows = table.getElementsByTagName('tr');
+
+                        for (let i = 0; i < rows.length; i++) {
+                            let cells = rows[i].getElementsByTagName('td');
+
+                            let match = Array.from(cells).some(cell => cell.innerText.toUpperCase().includes(filter));
+
+                            if (match) {
+                                rows[i].style.display = "";
+                            } else {
+                                rows[i].style.display = "none";
+                            }
+                        }
+                    });
+
                 },
 
                 //Function to cleanup event listeners and remove the center div inner html when "blur" or in otherwords when user navigates away from addin page
@@ -500,6 +522,7 @@
     </div>
     <div class="de-title-bar">
         <h1>Gridline - Driver Accepted/Rejected HOS Logs - Past 7 Days</h1>
+        <input type="text" class="de-searchBox" id="de-searchInput" placeholder="Search">
     </div>
     <div id="center">
 
