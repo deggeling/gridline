@@ -173,7 +173,6 @@
                         });
                     }
                 },
-
                 //Function to grab and export current table structure to CSV triggered on export button click
                 exportToCSV = function () {
                     let headers = Array.from(document.querySelectorAll('.de-responsive-table table th')).map(th => th.textContent);
@@ -197,6 +196,19 @@
                     link.click();
                     document.body.removeChild(link);
                 },
+                //Function for handling refresh button clicks
+                refreshDataButtonClickHandler = function () {
+                    var formattedFromDate = new Date(document.getElementById('fromDate').value).toISOString();
+                    var formattedToDate = new Date(document.getElementById('toDate').value).toISOString();
+                    console.log('formattedFromDate on click : ' + formattedFromDate + '  formattedToDate on click : ' + formattedToDate);
+
+                    // Clear the inner HTML of the center div
+                    document.getElementById('center').innerHTML = '';
+
+                    // Call refreshPage again with the new dates
+                    refreshPage(formattedFromDate, formattedToDate);
+                },
+                //Main function for API calls and redraws of table content
                 refreshPage = function (fromDate, toDate) {
                     // If no arguments are provided, default to the current date and seven days ago
                     let now = toDate ? new Date(toDate) : new Date();
@@ -213,18 +225,7 @@
                     document.getElementById('toDate').value = pickerToDate;
                     document.getElementById('toDate').max = pickerToDate;
 
-                    // Function for hanlding Refresh Data Button click and clearing table/getting new results from chose date
-                    function refreshDataButtonClickHandler() {
-                        var formattedFromDate = new Date(document.getElementById('fromDate').value).toISOString();
-                        var formattedToDate = new Date(document.getElementById('toDate').value).toISOString();
-                        console.log('formattedFromDate on click : ' + formattedFromDate + '  formattedToDate on click : ' + formattedToDate);
 
-                        // Clear the inner HTML of the center div
-                        document.getElementById('center').innerHTML = '';
-
-                        // Call refreshPage again with the new dates
-                        refreshPage(formattedFromDate, formattedToDate);
-                    }
                     // Get the refreshDataButton element
                     let refreshDataButton = document.getElementById('refreshDataButton');
                     // Remove existing event listener
