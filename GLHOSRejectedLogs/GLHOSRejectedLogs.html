@@ -207,8 +207,8 @@
                     var endDate = new Date(endDateValue);
 
                     // Adjust the dates based on the timezone offset
-                    startDate.setMinutes(startDate.getMinutes() - startDate.getTimezoneOffset());
-                    endDate.setMinutes(endDate.getMinutes() - endDate.getTimezoneOffset());
+                    startDate.setMinutes(startDate.getMinutes() + startDate.getTimezoneOffset());
+                    endDate.setMinutes(endDate.getMinutes() + endDate.getTimezoneOffset());
 
                     // Adjust startDate to the start of the day in local time
                     startDate.setHours(0, 0, 0, 0);
