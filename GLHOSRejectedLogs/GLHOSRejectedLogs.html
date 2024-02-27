@@ -198,8 +198,28 @@
                 },
                 //Function for handling refresh button clicks
                 refreshDataButtonClickHandler = function () {
-                    var formattedFromDate = new Date(document.getElementById('fromDate').value).toISOString();
-                    var formattedToDate = new Date(document.getElementById('toDate').value).toISOString();
+                    // Get the startDate and endDate values from the date pickers
+                    var startDateValue = document.getElementById('fromDate').value;
+                    var endDateValue = document.getElementById('toDate').value;
+
+                    // Create new Date objects from the values
+                    var startDate = new Date(startDateValue);
+                    var endDate = new Date(endDateValue);
+
+                    // Adjust the dates based on the timezone offset
+                    startDate.setMinutes(startDate.getMinutes() - startDate.getTimezoneOffset());
+                    endDate.setMinutes(endDate.getMinutes() - endDate.getTimezoneOffset());
+
+                    // Adjust startDate to the start of the day in local time
+                    startDate.setHours(0, 0, 0, 0);
+
+                    // Adjust endDate to the end of the day in local time
+                    endDate.setHours(23, 59, 59, 999);
+
+                    // Convert the dates to ISO strings
+                    var formattedFromDate = startDate.toISOString();
+                    var formattedToDate = endDate.toISOString();
+
                     console.log('formattedFromDate on click : ' + formattedFromDate + '  formattedToDate on click : ' + formattedToDate);
 
                     // Clear the inner HTML of the center div
@@ -533,7 +553,7 @@
         <button id="de_ExportButton" class="de-Export-button">Export to CSV</button>
     </div>
     <div class="de-title-bar">
-        <h1>Gridline Assigned HOS Logs Audit (Last 7 days default)</h1>
+        <h1>Gridline - Assigned HOS Logs Audit (Last 7 days default)</h1>
         <input type="text" class="de-searchBox" id="de-searchInput" placeholder="Search">
     </div>
     <div id="center">
