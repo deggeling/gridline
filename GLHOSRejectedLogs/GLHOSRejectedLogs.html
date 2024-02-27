@@ -45,7 +45,7 @@
                     // create 3 placeholder headers for the 3 new columns to be filled in by second API call data details relation by LogID
                     // create a "Manually Added By" header
                     var th6 = document.createElement("TH");
-                    th6.textContent = "Manually Added/Edited By";
+                    th6.textContent = "Manually Assigned By";
                     tr.appendChild(th6);
 
                     // Create a "Log Type" header
@@ -55,7 +55,7 @@
 
                     // Create a Manually Added Date header
                     var th8 = document.createElement("TH");
-                    th8.textContent = "Latest Added/Edited";
+                    th8.textContent = "Latest Assignment Date";
                     tr.appendChild(th8);
 
 
@@ -212,7 +212,7 @@
                 refreshPage = function (fromDate, toDate) {
                     // If no arguments are provided, default to the current date and seven days ago
                     let now = toDate ? new Date(toDate) : new Date();
-                    let sevenDaysAgo = fromDate ? new Date(fromDate) : new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    let sevenDaysAgo = fromDate ? new Date(fromDate) : new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
                     let ISOtoDate = now.toISOString();
                     let ISOfromDate = sevenDaysAgo.toISOString();
@@ -226,11 +226,9 @@
                     document.getElementById('toDate').max = pickerToDate;
 
 
-                    // Get the refreshDataButton element
+                    // Get the refreshDataButton element, remove listener if it exists(doesnt fail if not), then add a new one to prevent duplication of API calls/table draw
                     let refreshDataButton = document.getElementById('refreshDataButton');
-                    // Remove existing event listener
                     refreshDataButton.removeEventListener('click', refreshDataButtonClickHandler);
-                    // Add the new event listener
                     refreshDataButton.addEventListener('click', refreshDataButtonClickHandler);
 
 
@@ -241,7 +239,7 @@
                             fromDate: ISOfromDate,
                             toDate: ISOtoDate
                         },
-                        resultsLimit: 30000
+                        resultsLimit: 50000
                     }, function (result) {
 
                         // Function for parsing Audit EDIT Log HOS items and fields
@@ -276,6 +274,9 @@
                         // Add Eventer Listener to Parent Div to handle event delegation for any children in table with event.target.getAttribute("data-id") in listed function
                         center.addEventListener("click", goToHOSLogs, false);
 
+                        //temp log # of Edit Log results
+                        console.log('Number of AUDIT EDIT results received: ' + result.length);
+
                         // Filter HOS Results to just Rejected before passing into tableCreator using extractValues function above
                         let filteredResult = result
                             .filter(r => {
@@ -307,9 +308,6 @@
 
                         center.appendChild(tableCreator(filteredResult));
                         //HOS EDITS API NOW COMPLETED AND TABLE BUILT
-
-
-
 
                         // parse another managerFilteredResult to match up to the existing "data-id" rows and fill ID
                         function extractValuesfromManagerEdit(logString) {
@@ -376,9 +374,6 @@
                         }
 
 
-
-
-
                         // After table created with placeholders for HOS ADD Audit entries in place and HOS EDIT Table is filled and modified with edit additional manager data
                         // get the HOS ADD results to filter and parse and match back up to "data-id" rows
                         api.call("Get", {
@@ -388,7 +383,7 @@
                                 fromDate: ISOfromDate,
                                 toDate: ISOtoDate
                             },
-                            resultsLimit: 30000
+                            resultsLimit: 50000
                         }, function (result) {
                             //function to parse HOS ADD comment HOS log ID and Log Status
                             function extractValuesFromAddHOS(logString) {
@@ -409,6 +404,9 @@
                                     return null;
                                 }
                             }
+
+                            //temp log # of Add Log results
+                            console.log('Number of AUDIT ADD results received: ' + result.length);
 
                             // Filter HOS Results to just Other Authenticate User Adds 
                             let filteredResult = result
@@ -458,7 +456,7 @@
                                     let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
                                     tdManuallyAddedDate.textContent = date.toLocaleDateString('en-US', options).replace(',', '');
                                 }
-                                // check final contents for leftover "Loading..." Cells in "Manually Added/Edited By" on resulting table as they are just Engine Power Up/Down Auto logs not to be shown
+                                // check final contents for leftover "Loading..." Cells in "Manually Assigned By" on resulting table as they are just Engine Power Up/Down Auto logs not to be shown
                                 let finalcheckcell = row.getElementsByTagName("td")[5];
                                 if (finalcheckcell.innerText === "Loading...") {
                                     row.parentNode.removeChild(row);
@@ -535,7 +533,7 @@
         <button id="de_ExportButton" class="de-Export-button">Export to CSV</button>
     </div>
     <div class="de-title-bar">
-        <h1>Gridline - Driver Accepted/Rejected HOS Logs - Past 7 Days</h1>
+        <h1>Gridline Assigned HOS Logs Audit (Last 7 days default)</h1>
         <input type="text" class="de-searchBox" id="de-searchInput" placeholder="Search">
     </div>
     <div id="center">
