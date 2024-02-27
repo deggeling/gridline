@@ -197,25 +197,30 @@
                     link.click();
                     document.body.removeChild(link);
                 },
-                refreshPage = function () {
-                    //Get UTC date for right now and past 7 days (to and from dates) and convert to ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ)
-                    let now = new Date();
-                    let sevenDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-                    let toDate = now.toISOString();
-                    let fromDate = sevenDaysAgo.toISOString();
-                    // date picker defaults
-                    // Format dates as "YYYY-MM-DD" as the date picker expects for values
-                    let pickertoDate = now.toISOString().split('T')[0];
-                    let pickerfromDate = sevenDaysAgo.toISOString().split('T')[0];
-                    document.getElementById('fromDate').value = pickerfromDate;
-                    document.getElementById('toDate').value = pickertoDate;
-                    document.getElementById('toDate').max = pickertoDate;
+                refreshPage = function (fromDate, toDate) {
+                    // If no arguments are provided, default to the current date and seven days ago
+                    let now = toDate ? new Date(toDate) : new Date();
+                    let sevenDaysAgo = fromDate ? new Date(fromDate) : new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-                    //testing refreshDataButton Listener
+                    let isoToDate = now.toISOString();
+                    let isoFromDate = sevenDaysAgo.toISOString();
+
+                    // Format dates as "YYYY-MM-DD" as the date picker expects for values
+                    let pickerToDate = isoToDate.split('T')[0];
+                    let pickerFromDate = isoFromDate.split('T')[0];
+
+                    document.getElementById('fromDate').value = pickerFromDate;
+                    document.getElementById('toDate').value = pickerToDate;
+                    document.getElementById('toDate').max = pickerToDate;
+
+                    // Add event listener to refreshDataButton
                     document.getElementById('refreshDataButton').addEventListener('click', function () {
                         var formattedFromDate = new Date(document.getElementById('fromDate').value).toISOString();
                         var formattedToDate = new Date(document.getElementById('toDate').value).toISOString();
                         console.log('formattedFromDate on click : ' + formattedFromDate + '  formattedToDate on click : ' + formattedToDate);
+
+                        // Call refreshPage again with the new dates
+                        refreshPage(formattedFromDate, formattedToDate);
                     });
 
 
