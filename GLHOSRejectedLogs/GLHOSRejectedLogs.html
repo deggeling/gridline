@@ -202,12 +202,12 @@
                     let now = toDate ? new Date(toDate) : new Date();
                     let sevenDaysAgo = fromDate ? new Date(fromDate) : new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-                    let toDate = now.toISOString();
-                    let fromDate = sevenDaysAgo.toISOString();
+                    let ISOtoDate = now.toISOString();
+                    let ISOfromDate = sevenDaysAgo.toISOString();
 
                     // Format dates as "YYYY-MM-DD" as the date picker expects for values
-                    let pickerToDate = toDate.split('T')[0];
-                    let pickerFromDate = fromDate.split('T')[0];
+                    let pickerToDate = ISOtoDate.split('T')[0];
+                    let pickerFromDate = ISOfromDate.split('T')[0];
 
                     document.getElementById('fromDate').value = pickerFromDate;
                     document.getElementById('toDate').value = pickerToDate;
@@ -228,8 +228,8 @@
                         typeName: "Audit",
                         search: {
                             name: "HosLogEdit",
-                            fromDate: fromDate,
-                            toDate: toDate
+                            fromDate: ISOfromDate,
+                            toDate: ISOtoDate
                         },
                         resultsLimit: 30000
                     }, function (result) {
@@ -375,8 +375,8 @@
                             typeName: "Audit",
                             search: {
                                 name: "HosLogAdd",
-                                fromDate: fromDate,
-                                toDate: toDate
+                                fromDate: ISOfromDate,
+                                toDate: ISOtoDate
                             },
                             resultsLimit: 30000
                         }, function (result) {
