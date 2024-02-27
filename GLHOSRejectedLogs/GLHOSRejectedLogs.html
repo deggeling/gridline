@@ -202,12 +202,12 @@
                     let now = toDate ? new Date(toDate) : new Date();
                     let sevenDaysAgo = fromDate ? new Date(fromDate) : new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-                    let isoToDate = now.toISOString();
-                    let isoFromDate = sevenDaysAgo.toISOString();
+                    let toDate = now.toISOString();
+                    let fromDate = sevenDaysAgo.toISOString();
 
                     // Format dates as "YYYY-MM-DD" as the date picker expects for values
-                    let pickerToDate = isoToDate.split('T')[0];
-                    let pickerFromDate = isoFromDate.split('T')[0];
+                    let pickerToDate = toDate.split('T')[0];
+                    let pickerFromDate = fromDate.split('T')[0];
 
                     document.getElementById('fromDate').value = pickerFromDate;
                     document.getElementById('toDate').value = pickerToDate;
