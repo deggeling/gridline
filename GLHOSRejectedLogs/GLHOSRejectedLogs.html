@@ -213,15 +213,24 @@
                     document.getElementById('toDate').value = pickerToDate;
                     document.getElementById('toDate').max = pickerToDate;
 
-                    // Add event listener to refreshDataButton
-                    document.getElementById('refreshDataButton').addEventListener('click', function () {
+                    // Function for hanlding Refresh Data Button click and clearing table/getting new results from chose date
+                    function refreshDataButtonClickHandler() {
                         var formattedFromDate = new Date(document.getElementById('fromDate').value).toISOString();
                         var formattedToDate = new Date(document.getElementById('toDate').value).toISOString();
                         console.log('formattedFromDate on click : ' + formattedFromDate + '  formattedToDate on click : ' + formattedToDate);
 
+                        // Clear the inner HTML of the center div
+                        document.getElementById('center').innerHTML = '';
+
                         // Call refreshPage again with the new dates
                         refreshPage(formattedFromDate, formattedToDate);
-                    });
+                    }
+                    // Get the refreshDataButton element
+                    let refreshDataButton = document.getElementById('refreshDataButton');
+                    // Remove existing event listener
+                    refreshDataButton.removeEventListener('click', refreshDataButtonClickHandler);
+                    // Add the new event listener
+                    refreshDataButton.addEventListener('click', refreshDataButtonClickHandler);
 
 
                     api.call("Get", {
