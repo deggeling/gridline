@@ -232,7 +232,7 @@
                 refreshPage = function (fromDate, toDate) {
                     // If no arguments are provided, default to the current date and seven days ago
                     let now = toDate ? new Date(toDate) : new Date();
-                    let sevenDaysAgo = fromDate ? new Date(fromDate) : new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    let sevenDaysAgo = fromDate ? new Date(fromDate) : new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000);
 
                     let ISOtoDate = now.toISOString();
                     let ISOfromDate = sevenDaysAgo.toISOString();
@@ -243,7 +243,10 @@
 
                     document.getElementById('fromDate').value = pickerFromDate;
                     document.getElementById('toDate').value = pickerToDate;
-                    document.getElementById('toDate').max = pickerToDate;
+                    //set max date of datepicker selectable to Today, local timezone
+                    let today = new Date();
+                    document.getElementById('toDate').max = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
 
 
                     // Get the refreshDataButton element, remove listener if it exists(doesnt fail if not), then add a new one to prevent duplication of API calls/table draw
@@ -553,7 +556,7 @@
         <button id="de_ExportButton" class="de-Export-button">Export to CSV</button>
     </div>
     <div class="de-title-bar">
-        <h1>Gridline - Assigned HOS Logs Audit (Last 7 days default)</h1>
+        <h1>Gridline - Assigned HOS Logs Audit</h1>
         <input type="text" class="de-searchBox" id="de-searchInput" placeholder="Search">
     </div>
     <div id="center">
