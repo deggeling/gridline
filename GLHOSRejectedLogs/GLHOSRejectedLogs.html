@@ -529,10 +529,13 @@
                         .addEventListener("click", function () {
                             state.gotoPage("hosLogs");
                         }, false);
-                    document.getElementById('de_ExportButton').addEventListener('click', exportToCSV);
+                    //document.getElementById('de_ExportButton').addEventListener('click', exportToCSV);
                     callback();
                 },
                 focus: function (api, state) {
+                    //remove and readd Export Button Listener to make sure only 1 export even if navigate away from page
+                    document.getElementById('de_ExportButton').removeEventListener('click', exportToCSV);
+                    document.getElementById('de_ExportButton').addEventListener('click', exportToCSV);
                     refreshPage();
                 },
                 blur: function (api, state) {
