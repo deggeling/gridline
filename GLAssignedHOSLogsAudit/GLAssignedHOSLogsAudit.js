@@ -10,45 +10,53 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
             var tr = document.createElement("TR");
 
             // Create "HOS Log Status" header, will be clickable column to go to HOS LOG ID, if exist
+            // NEW -- Keeping same initial header and coloring potentially adding yellow and "Pending" Status (th1), this column will essentially fill in loading..., then statuses/removals
             var th1 = document.createElement("TH");
             th1.textContent = "HOS Log Status";
             tr.appendChild(th1);
 
-            // Create "Rejected Date" header
+            // OLD -- Create "Rejected/Accepted Date (Recent First)" header
+            // NEW -- create a "Manually Assigned By" header (was th6)
             var th2 = document.createElement("TH");
-            th2.textContent = "Rejected/Accepted Date (Recent First)";
+            th2.textContent = "Manually Assigned By";
             tr.appendChild(th2);
 
-            // Create "Username" header
+            // OLD -- Create "User/Driver" header
+            // NEW-- Create a "Assignment Date (Recent First)" header (was th8) (also will now sort by recent first here on manager initiate instead of driver accept/reject)
             var th3 = document.createElement("TH");
-            th3.textContent = "User/Driver";
+            th3.textContent = "Assignment Date (Recent First)";
             tr.appendChild(th3);
 
-            // Create "Device" header
+            // OLD -- Create "Vehicle" header
+            // NEW -- Create "User/Driver" header (was th3)
             var th4 = document.createElement("TH");
-            th4.textContent = "Vehicle"
+            th4.textContent = "User/Driver"
             tr.appendChild(th4);
 
-            // create a Date of HOS Log header
+            // OLD -- Create a "Date of HOS Log" header
+            // NEW -- Create "Vehicle" header (was th4)
             var th5 = document.createElement("TH");
-            th5.textContent = "Date of HOS Log";
+            th5.textContent = "Vehicle";
             tr.appendChild(th5);
 
 
-            // create 3 placeholder headers for the 3 new columns to be filled in by second API call data details relation by LogID
-            // create a "Manually Added By" header
+            // create 3 placeholder headers for the 3 new columns to be filled in by second API call data details relation by LogID based on driver accept/reject
+            // OLD -- create a "Manually Assigned By" header
+            // NEW -- Create a "Date of HOS Log" header (was th5), this is also no longer a placeholder and grabbed during initial manager initiated call
             var th6 = document.createElement("TH");
-            th6.textContent = "Manually Assigned By";
+            th6.textContent = "Date of HOS Log";
             tr.appendChild(th6);
 
-            // Create a "Log Type" header
+            // OLD -- Create a "Log Status Type" header
+            // NEW -- Staying in same place as can get from manager pull
             var th7 = document.createElement("TH");
             th7.textContent = "Log Status Type";
             tr.appendChild(th7);
 
-            // Create a Manually Added Date header
+            // OLD - Create a "Latest Assignment Date" header 
+            // NEW -- Create "Driver Accepted/Rejected Date" header (was th2 and sorted by recent), will essentially be blank on pending and intially loading... til driver table addon
             var th8 = document.createElement("TH");
-            th8.textContent = "Latest Assignment Date";
+            th8.textContent = "Driver Accepted/Rejected Date";
             tr.appendChild(th8);
 
 
@@ -487,7 +495,7 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                 console.log(error.message);
             });
 
-            //attempt at searchable table listener after full table created
+            //Create searchable table listener after full table created
             let searchinput = document.getElementById('de-searchInput');
             let searchTableRows = center.getElementsByTagName("tr");
 
