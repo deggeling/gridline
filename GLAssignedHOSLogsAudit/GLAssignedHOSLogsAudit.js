@@ -501,36 +501,52 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
 
 
                     // Get the Existing Edit HOS table rows and iterate through them to match up the HOS ADD results to the "data-id" rows
-                    // let tableRows = center.getElementsByTagName("tr");
-                    // for (let i = 1; i < tableRows.length; i++) {
-                    //     //first row is actually headers row so starting loop at 1
-                    //     let row = tableRows[i];
-                    //     let id = row.getElementsByTagName("td")[0].getAttribute("data-id");
-                    //     let matchingAdd = filteredResult.find(r => r.ID === id);
-                    //     if (matchingAdd) {
-                    //         let {
-                    //             userName,
-                    //             Status,
-                    //             dateTime
-                    //         } = matchingAdd;
-                    //         let tdManuallyAddedBy = row.getElementsByTagName("td")[5];
-                    //         let tdLogType = row.getElementsByTagName("td")[6];
-                    //         let tdManuallyAddedDate = row.getElementsByTagName("td")[7];
-                    //         tdManuallyAddedBy.textContent = userName;
-                    //         tdLogType.textContent = Status;
+                    let tableRows = center.getElementsByTagName("tr");
+                    for (let i = 1; i < tableRows.length; i++) {
+                        //first row is actually headers row so starting loop at 1
+                        let row = tableRows[i];
+                        let id = row.getElementsByTagName("td")[0].getAttribute("data-id");
+                        let matchingAcceptReject = driverFilteredResult.find(r => r.ID === id);
+                        if (matchingAcceptReject) {
+                            let {
+                                userName,
+                                comment,
+                                Status,
+                                dateTime
+                            } = matchingAcceptReject;
+                            let tdLogStatus = row.getElementsByTagName("td")[0];
+                            let tdDateTime = row.getElementsByTagName("td")[7];
 
-                    //         // Convert the dateTime property to a friendly format
-                    //         let date = new Date(dateTime);
-                    //         let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-                    //         tdManuallyAddedDate.textContent = date.toLocaleDateString('en-US', options).replace(',', '');
-                    //     }
-                    //     // check final contents for leftover "Loading..." Cells in "Manually Assigned By" on resulting table as they are just Engine Power Up/Down Auto logs not to be shown
-                    //     let finalcheckcell = row.getElementsByTagName("td")[5];
-                    //     if (finalcheckcell.innerText === "Loading...") {
-                    //         row.parentNode.removeChild(row);
-                    //         i--; // IMPORTANT Decrement the counter as the rows list is now shorter
-                    //     }
-                    // }
+
+                            //parse the driver comments where the id matches a row to fill in HOS Log Status details
+                            if (!comment.includes('Added Annotations') && comment.includes('State: Rejected') && comment.includes('Origin: Unassigned')) {
+                                tdLogStatus.textContent = "REJECTED - Back to Unidentified";
+                                tdLogStatus.style.backgroundColor = '#f3c4c4'; // light red
+                            } else if (!comment.includes('Added Annotations') && comment.includes('State: Rejected')) {
+                                tdLogStatus.textContent = 'REJECTED - Manual Log Addition (no longer exists)';
+                                tdLogStatus.style.backgroundColor = '#f3c4c4'; // light red
+                            } else if (!comment.includes('Added Annotations') && comment.includes('State: Active')) {
+                                tdLogStatus.textContent = 'ACCEPTED - Driver Accepted Log';
+                                tdLogStatus.style.backgroundColor = '#cef3c4';
+                            } else {
+                                tdLogStatus.textContent = comment;
+                            }
+
+                            // Convert the dateTime property to a friendly format
+                            let date = new Date(dateTime);
+                            let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                            tdDateTime.textContent = date.toLocaleDateString('en-US', options).replace(',', '');
+                        }
+
+
+
+                        // check final contents for leftover "Loading..." Cells in "Manually Assigned By" on resulting table as they are just Engine Power Up/Down Auto logs not to be shown
+                        // let finalcheckcell = row.getElementsByTagName("td")[5];
+                        // if (finalcheckcell.innerText === "Loading...") {
+                        //     row.parentNode.removeChild(row);
+                        //     i--; // IMPORTANT Decrement the counter as the rows list is now shorter
+                        // }
+                    }
 
 
 
