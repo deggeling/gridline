@@ -83,36 +83,44 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                 var tdLogStatus = document.createElement("TD");
                 tdLogStatus.setAttribute("data-id", entity.ID);
                 console.log(entity.comment);
-                if (!entity.comment.includes('Added Annotations') && entity.comment.includes('State: Rejected') && entity.comment.includes('Origin: Unassigned')) {
-                    tdLogStatus.textContent = "REJECTED - Back to Unidentified";
-                    tdLogStatus.style.backgroundColor = '#f3c4c4'; // light red
-                } else if (!entity.comment.includes('Added Annotations') && entity.comment.includes('State: Rejected')) {
-                    tdLogStatus.textContent = 'REJECTED - Manual Log Addition (no longer exists)';
-                    tdLogStatus.style.backgroundColor = '#f3c4c4'; // light red
-                } else if (!entity.comment.includes('Added Annotations') && entity.comment.includes('State: Active')) {
-                    tdLogStatus.textContent = 'ACCEPTED - Driver Accepted Log';
-                    tdLogStatus.style.backgroundColor = '#cef3c4';
-                } else {
-                    tdLogStatus.textContent = entity.comment;
-                }
+                // if (!entity.comment.includes('Added Annotations') && entity.comment.includes('State: Rejected') && entity.comment.includes('Origin: Unassigned')) {
+                //     tdLogStatus.textContent = "REJECTED - Back to Unidentified";
+                //     tdLogStatus.style.backgroundColor = '#f3c4c4'; // light red
+                // } else if (!entity.comment.includes('Added Annotations') && entity.comment.includes('State: Rejected')) {
+                //     tdLogStatus.textContent = 'REJECTED - Manual Log Addition (no longer exists)';
+                //     tdLogStatus.style.backgroundColor = '#f3c4c4'; // light red
+                // } else if (!entity.comment.includes('Added Annotations') && entity.comment.includes('State: Active')) {
+                //     tdLogStatus.textContent = 'ACCEPTED - Driver Accepted Log';
+                //     tdLogStatus.style.backgroundColor = '#cef3c4';
+                // } else {
+                //     tdLogStatus.textContent = entity.comment;
+                // }
+                tdLogStatus.textContent = "Loading...";
                 tr.appendChild(tdLogStatus);
 
 
-                // Create "Rejected dateTime" cell, format example content "dateTime": "2015-02-12T22:40:57.522Z" to 02/12/2015 10:40:57 PM, convert to browser local TZ
-                var tdDateTime = document.createElement("TD");
+                // Create "Manually Added By" cell
+                var tdManuallyAddedBy = document.createElement("TD");
+                tdManuallyAddedBy.textContent = entity.userName;
+                tr.appendChild(tdManuallyAddedBy);
+
+
+                // Create "Assignment Date" cell
+                var tdManuallyAddedDate = document.createElement("TD");
+                tdManuallyAddedDate.textContent = "Loading...";
                 if (entity.dateTime) {
                     var dateTimeDate = new Date(entity.dateTime);
                     var dateFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-                    tdDateTime.textContent = dateTimeDate.toLocaleDateString('en-us', dateFormatOptions).replace(',', '');
+                    tdManuallyAddedDate.textContent = dateTimeDate.toLocaleDateString('en-us', dateFormatOptions).replace(',', '');
                 } else {
-                    tdDateTime.textContent = "N/A";
+                    tdManuallyAddedDate.textContent = "N/A";
                 }
-                tr.appendChild(tdDateTime);
+                tr.appendChild(tdManuallyAddedDate);
 
 
-                // Create "UserName/Driver" cell
+                // Create "UserName/Driver" cell  (this may be null/undefined until driver details due to parse comment, check later)
                 var tdName = document.createElement("TD");
-                tdName.textContent = entity.userName;
+                tdName.textContent = entity.Driver;
                 tr.appendChild(tdName);
 
 
@@ -134,21 +142,26 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                 tr.appendChild(tdTimestamp);
 
 
-                //Create 3 Placeholder cells for the 3 new columns to be filled in by second API call data details relation by LogID "data-id" of the row
-                // Create "Manually Added By" cell
-                var tdManuallyAddedBy = document.createElement("TD");
-                tdManuallyAddedBy.textContent = "Loading...";
-                tr.appendChild(tdManuallyAddedBy);
-
                 // Create "Log Type" cell
                 var tdLogType = document.createElement("TD");
-                tdLogType.textContent = "Loading...";
+                tdLogType.textContent = entity.Status;
                 tr.appendChild(tdLogType);
 
-                // Create "Manually Added Date" cell
-                var tdManuallyAddedDate = document.createElement("TD");
-                tdManuallyAddedDate.textContent = "Loading...";
-                tr.appendChild(tdManuallyAddedDate);
+
+
+                // Create "Rejected dateTime" cell, format example content "dateTime": "2015-02-12T22:40:57.522Z" to 02/12/2015 10:40:57 PM, convert to browser local TZ
+                // could also be "pending and no match to fill in later"
+                var tdDateTime = document.createElement("TD");
+                // if (entity.dateTime) {
+                //     var dateTimeDate = new Date(entity.dateTime);
+                //     var dateFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                //     tdDateTime.textContent = dateTimeDate.toLocaleDateString('en-us', dateFormatOptions).replace(',', '');
+                // } else {
+                //     tdDateTime.textContent = "N/A";
+                // }
+                tdDateTime.textContent = "Loading...";
+                tr.appendChild(tdDateTime);
+
 
                 // Append Completed new row to the in progress table body
                 tbody.appendChild(tr);
@@ -229,7 +242,9 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
             // Call refreshPage again with the new dates
             refreshPage(formattedFromDate, formattedToDate);
         },
-        //Main function for API calls and redraws of table content
+
+
+        //new format main function for API calls and redraws of table content 
         refreshPage = function (fromDate, toDate) {
             // If no arguments are provided, default to the current date and seven days ago
             let now = toDate ? new Date(toDate) : new Date();
@@ -269,7 +284,7 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                 // Function for parsing Audit EDIT Log HOS items and fields
                 function extractValues(logString) {
                     try {
-                        const idMatch = logString.match(/ID: ([\w\-]+)/);
+                        const idMatch = logString.match(/ID: ([\w\-_]+)/);
                         const stateMatch = logString.match(/State: (\w+)/);
                         const statusMatch = logString.match(/Status: (\w+)/);
                         const eventRecordStatusMatch = logString.match(/EventRecordStatus: (\d+)/);
@@ -297,12 +312,14 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
 
                 // Add Eventer Listener to Parent Div to handle event delegation for any children in table with event.target.getAttribute("data-id") in listed function
                 center.addEventListener("click", goToHOSLogs, false);
-
                 //temp log # of Edit Log results
                 console.log('Number of AUDIT EDIT results received: ' + result.length);
 
+
+
+                //Driver Accept/Rejects Filter from Edits
                 // Filter HOS Results to just Rejected before passing into tableCreator using extractValues function above
-                let filteredResult = result
+                let driverFilteredResult = result
                     .filter(r => {
                         if (r.comment) {
                             let comment = r.comment.toLowerCase().replaceAll(' ', '');
@@ -322,34 +339,34 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                                 Device,
                                 Timestamp
                             } = info;
-                            console.log(`Driver:${Driver}, Device:${Device}, Timestamp:${Timestamp}, HOS Log ID:${ID}, State:${State}, Status:${Status}, EventRecordStatus:${EventRecordStatus}`);
+                            // console.log(`Driver:${Driver}, Device:${Device}, Timestamp:${Timestamp}, HOS Log ID:${ID}, State:${State}, Status:${Status}, EventRecordStatus:${EventRecordStatus}`);
                             return { ...r, ...info }; // Merge the properties of r and info
                         } else {
-                            console.log('Error extracting info from comment:', r.comment);
+                            console.log('Error extracting info from Driver comment:', r.comment);
                             return null;
                         }
                     });
 
-                center.appendChild(tableCreator(filteredResult));
-                //HOS EDITS API NOW COMPLETED AND TABLE BUILT
+
+
 
                 // parse another managerFilteredResult to match up to the existing "data-id" rows and fill ID
-                function extractValuesfromManagerEdit(logString) {
-                    try {
-                        const idMatch = logString.match(/ID: ([\w\-_]+),/);
+                // function extractValuesfromManagerEdit(logString) {
+                //     try {
+                //         const idMatch = logString.match(/ID: ([\w\-_]+),/);
 
-                        const extractManagerEditResult = {
-                            ID: idMatch ? idMatch[1] : undefined
-                        };
-                        //temp console log the logstring
-                        console.log("HOS Manager EDIT comment ID", logString);
+                //         const extractManagerEditResult = {
+                //             ID: idMatch ? idMatch[1] : undefined
+                //         };
+                //         //temp console log the logstring
+                //         console.log("HOS Manager EDIT comment ID", logString);
 
-                        return extractManagerEditResult;
-                    } catch (error) {
-                        console.error('Error parsing the HOS Manager EDIT log string', error);
-                        return null;
-                    }
-                }
+                //         return extractManagerEditResult;
+                //     } catch (error) {
+                //         console.error('Error parsing the HOS Manager EDIT log string', error);
+                //         return null;
+                //     }
+                // }
 
                 let managerFilteredResult = result
                     .filter(r => {
@@ -360,42 +377,55 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                         return false; // If r.comment is undefined or null, do not include r in the filtered result
                     })
                     .map(r => {
-                        let info = extractValuesfromManagerEdit(r.comment);
+                        let info = extractValues(r.comment);
                         if (info) {
                             let {
-                                ID
+                                ID,
+                                State,
+                                Status,
+                                EventRecordStatus,
+                                Driver,
+                                Device,
+                                Timestamp
                             } = info;
-                            console.log(`Unassigned Manager edit ID:${ID}`);
+                            // console.log(`Unassigned Manager edit ID:${ID}`);
                             return { ...r, ...info }; // Merge the properties of r and info
                         } else {
-                            console.log('Error extracting info from comment:', r.comment);
+                            console.log('Error extracting info from Manager Edit comment:', r.comment);
                             return null;
                         }
                     });
 
-                // look over the existing rows to fill in manager unassigned edits data   
-                let tableRows = center.getElementsByTagName("tr");
-                for (let i = 1; i < tableRows.length; i++) {
-                    //first row is actually headers row so starting loop at 1
-                    let row = tableRows[i];
-                    let id = row.getElementsByTagName("td")[0].getAttribute("data-id");
-                    let matchingAdd = managerFilteredResult.find(r => r.ID === id);
-                    if (matchingAdd) {
-                        let {
-                            userName,
-                            dateTime
-                        } = matchingAdd;
-                        let tdManuallyAddedBy = row.getElementsByTagName("td")[5];
-                        let tdLogType = row.getElementsByTagName("td")[6];
-                        let tdManuallyAddedDate = row.getElementsByTagName("td")[7];
-                        tdManuallyAddedBy.textContent = userName;
-                        tdLogType.textContent = "Auto Created D/ON";
-                        // Convert the dateTime property to a friendly format for ManuallyAddedDate
-                        let date = new Date(dateTime);
-                        let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-                        tdManuallyAddedDate.textContent = date.toLocaleDateString('en-US', options).replace(',', '');
-                    }
-                }
+
+
+
+                // look over the existing rows to fill in manager unassigned edits data 
+                // ***** THIS NEEDS TO MOVE TO END AND BE A driverFilteredResult table update  ***************************  
+                // let tableRows = center.getElementsByTagName("tr");
+                // for (let i = 1; i < tableRows.length; i++) {
+                //     //first row is actually headers row so starting loop at 1
+                //     let row = tableRows[i];
+                //     let id = row.getElementsByTagName("td")[0].getAttribute("data-id");
+                //     let matchingAdd = managerFilteredResult.find(r => r.ID === id);
+                //     if (matchingAdd) {
+                //         let {
+                //             userName,
+                //             dateTime
+                //         } = matchingAdd;
+                //         let tdManuallyAddedBy = row.getElementsByTagName("td")[5];
+                //         let tdLogType = row.getElementsByTagName("td")[6];
+                //         let tdManuallyAddedDate = row.getElementsByTagName("td")[7];
+                //         tdManuallyAddedBy.textContent = userName;
+                //         tdLogType.textContent = "Auto Created D/ON";
+                //         // Convert the dateTime property to a friendly format for ManuallyAddedDate
+                //         let date = new Date(dateTime);
+                //         let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                //         tdManuallyAddedDate.textContent = date.toLocaleDateString('en-US', options).replace(',', '');
+                //     }
+                // }
+
+
+
 
 
                 // After table created with placeholders for HOS ADD Audit entries in place and HOS EDIT Table is filled and modified with edit additional manager data
@@ -410,30 +440,30 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                     resultsLimit: 50000
                 }, function (result) {
                     //function to parse HOS ADD comment HOS log ID and Log Status
-                    function extractValuesFromAddHOS(logString) {
-                        try {
-                            const idMatch = logString.match(/ID: ([\w\-_]+),/);
-                            const statusMatch = logString.match(/Status: (\w+),/);
+                    // function extractValuesFromAddHOS(logString) {
+                    //     try {
+                    //         const idMatch = logString.match(/ID: ([\w\-_]+),/);
+                    //         const statusMatch = logString.match(/Status: (\w+),/);
 
-                            const extractHOSAddResult = {
-                                ID: idMatch ? idMatch[1] : undefined,
-                                Status: statusMatch ? statusMatch[1] : undefined
-                            };
-                            //temp console log the logstring
-                            console.log("HOS ADD comment", logString);
+                    //         const extractHOSAddResult = {
+                    //             ID: idMatch ? idMatch[1] : undefined,
+                    //             Status: statusMatch ? statusMatch[1] : undefined
+                    //         };
+                    //         //temp console log the logstring
+                    //         console.log("HOS ADD comment", logString);
 
-                            return extractHOSAddResult;
-                        } catch (error) {
-                            console.error('Error parsing the HOS ADD log string', error);
-                            return null;
-                        }
-                    }
+                    //         return extractHOSAddResult;
+                    //     } catch (error) {
+                    //         console.error('Error parsing the HOS ADD log string', error);
+                    //         return null;
+                    //     }
+                    // }
 
                     //temp log # of Add Log results
                     console.log('Number of AUDIT ADD results received: ' + result.length);
 
                     // Filter HOS Results to just Other Authenticate User Adds 
-                    let filteredResult = result
+                    let managerFilteredResultAdds = result
                         .filter(r => {
                             if (r.comment) {
                                 let comment = r.comment.toLowerCase().replaceAll(' ', '');
@@ -442,51 +472,69 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                             return false; // If r.comment is undefined or null, do not include r in the filtered result
                         })
                         .map(r => {
-                            let info = extractValuesFromAddHOS(r.comment);
+                            let info = extractValues(r.comment);
                             if (info) {
                                 let {
                                     ID,
+                                    State,
                                     Status,
+                                    EventRecordStatus,
+                                    Driver,
+                                    Device,
+                                    Timestamp
                                 } = info;
-                                console.log(`HOS ADD COMMENT - ID:${ID}, Status:${Status}`);
+                                // console.log(`HOS ADD COMMENT - ID:${ID}, Status:${Status}`);
                                 return { ...r, ...info }; // Merge the properties of r and info
                             } else {
-                                console.log('Error extracting info from HOS ADD comment:', r.comment);
+                                console.log('Error extracting info from Manager Add comment:', r.comment);
                                 return null;
                             }
                         });
 
-                    // Get the Existing Edit HOS table rows and iterate through them to match up the HOS ADD results to the "data-id" rows
-                    let tableRows = center.getElementsByTagName("tr");
-                    for (let i = 1; i < tableRows.length; i++) {
-                        //first row is actually headers row so starting loop at 1
-                        let row = tableRows[i];
-                        let id = row.getElementsByTagName("td")[0].getAttribute("data-id");
-                        let matchingAdd = filteredResult.find(r => r.ID === id);
-                        if (matchingAdd) {
-                            let {
-                                userName,
-                                Status,
-                                dateTime
-                            } = matchingAdd;
-                            let tdManuallyAddedBy = row.getElementsByTagName("td")[5];
-                            let tdLogType = row.getElementsByTagName("td")[6];
-                            let tdManuallyAddedDate = row.getElementsByTagName("td")[7];
-                            tdManuallyAddedBy.textContent = userName;
-                            tdLogType.textContent = Status;
 
-                            // Convert the dateTime property to a friendly format
-                            let date = new Date(dateTime);
-                            let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-                            tdManuallyAddedDate.textContent = date.toLocaleDateString('en-US', options).replace(',', '');
-                        }
-                        // check final contents for leftover "Loading..." Cells in "Manually Assigned By" on resulting table as they are just Engine Power Up/Down Auto logs not to be shown
-                        let finalcheckcell = row.getElementsByTagName("td")[5];
-                        if (finalcheckcell.innerText === "Loading...") {
-                            row.parentNode.removeChild(row);
-                            i--; // IMPORTANT Decrement the counter as the rows list is now shorter
-                        }
-                    }
+                    //Combine the filtered Manager Edits and Adds Arrays by spreading and send over to tableCreator
+                    let managerCombinedResult = [...managerFilteredResult, ...managerFilteredResultAdds];
+                    center.appendChild(tableCreator(managerCombinedResult));
+                    //HOS  API NOW COMPLETED AND TABLE BUILT out of Manager Edits/Adds
+                    //MORE TO COME, Parse through the now built table matching up drivers and then "pending" the missings
+
+
+
+                    // Get the Existing Edit HOS table rows and iterate through them to match up the HOS ADD results to the "data-id" rows
+                    // let tableRows = center.getElementsByTagName("tr");
+                    // for (let i = 1; i < tableRows.length; i++) {
+                    //     //first row is actually headers row so starting loop at 1
+                    //     let row = tableRows[i];
+                    //     let id = row.getElementsByTagName("td")[0].getAttribute("data-id");
+                    //     let matchingAdd = filteredResult.find(r => r.ID === id);
+                    //     if (matchingAdd) {
+                    //         let {
+                    //             userName,
+                    //             Status,
+                    //             dateTime
+                    //         } = matchingAdd;
+                    //         let tdManuallyAddedBy = row.getElementsByTagName("td")[5];
+                    //         let tdLogType = row.getElementsByTagName("td")[6];
+                    //         let tdManuallyAddedDate = row.getElementsByTagName("td")[7];
+                    //         tdManuallyAddedBy.textContent = userName;
+                    //         tdLogType.textContent = Status;
+
+                    //         // Convert the dateTime property to a friendly format
+                    //         let date = new Date(dateTime);
+                    //         let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                    //         tdManuallyAddedDate.textContent = date.toLocaleDateString('en-US', options).replace(',', '');
+                    //     }
+                    //     // check final contents for leftover "Loading..." Cells in "Manually Assigned By" on resulting table as they are just Engine Power Up/Down Auto logs not to be shown
+                    //     let finalcheckcell = row.getElementsByTagName("td")[5];
+                    //     if (finalcheckcell.innerText === "Loading...") {
+                    //         row.parentNode.removeChild(row);
+                    //         i--; // IMPORTANT Decrement the counter as the rows list is now shorter
+                    //     }
+                    // }
+
+
+
+
 
                 }, function (error) {
                     console.log(error.message);
@@ -494,6 +542,273 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
             }, function (error) {
                 console.log(error.message);
             });
+
+
+            //Main function for API calls and redraws of table content
+            // refreshPage = function (fromDate, toDate) {
+            //     // If no arguments are provided, default to the current date and seven days ago
+            //     let now = toDate ? new Date(toDate) : new Date();
+            //     let sevenDaysAgo = fromDate ? new Date(fromDate) : new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000);
+
+            //     let ISOtoDate = now.toISOString();
+            //     let ISOfromDate = sevenDaysAgo.toISOString();
+
+            //     // Format dates as "YYYY-MM-DD" as the date picker expects for values
+            //     let pickerToDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            //     let pickerFromDate = `${sevenDaysAgo.getFullYear()}-${String(sevenDaysAgo.getMonth() + 1).padStart(2, '0')}-${String(sevenDaysAgo.getDate()).padStart(2, '0')}`;
+
+            //     document.getElementById('fromDate').value = pickerFromDate;
+            //     document.getElementById('toDate').value = pickerToDate;
+            //     //set max date of datepicker selectable to Today, local timezone
+            //     let today = new Date();
+            //     document.getElementById('toDate').max = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+
+
+            //     // Get the refreshDataButton element, remove listener if it exists(doesnt fail if not), then add a new one to prevent duplication of API calls/table draw
+            //     let refreshDataButton = document.getElementById('refreshDataButton');
+            //     refreshDataButton.removeEventListener('click', refreshDataButtonClickHandler);
+            //     refreshDataButton.addEventListener('click', refreshDataButtonClickHandler);
+
+
+            //     api.call("Get", {
+            //         typeName: "Audit",
+            //         search: {
+            //             name: "HosLogEdit",
+            //             fromDate: ISOfromDate,
+            //             toDate: ISOtoDate
+            //         },
+            //         resultsLimit: 50000
+            //     }, function (result) {
+
+            //         // Function for parsing Audit EDIT Log HOS items and fields
+            //         function extractValues(logString) {
+            //             try {
+            //                 const idMatch = logString.match(/ID: ([\w\-]+)/);
+            //                 const stateMatch = logString.match(/State: (\w+)/);
+            //                 const statusMatch = logString.match(/Status: (\w+)/);
+            //                 const eventRecordStatusMatch = logString.match(/EventRecordStatus: (\d+)/);
+            //                 const driver = logString.match(/Driver: (\w+)/);
+            //                 const deviceMatch = logString.match(/Device: ([\w-]+)/);
+            //                 const timestamp = logString.match(/Timestamp: (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)/);
+
+
+            //                 const extractResult = {
+            //                     ID: idMatch ? idMatch[1] : undefined,
+            //                     State: stateMatch ? stateMatch[1] : undefined,
+            //                     Status: statusMatch ? statusMatch[1] : undefined,
+            //                     EventRecordStatus: eventRecordStatusMatch ? parseInt(eventRecordStatusMatch[1], 10) : undefined,
+            //                     Driver: driver ? driver[1] : undefined,
+            //                     Device: deviceMatch ? deviceMatch[1] : undefined,
+            //                     Timestamp: timestamp ? timestamp[1] : undefined
+            //                 };
+
+            //                 return extractResult;
+            //             } catch (error) {
+            //                 console.error('Error parsing the log string', error);
+            //                 return null;
+            //             }
+            //         }
+
+            //         // Add Eventer Listener to Parent Div to handle event delegation for any children in table with event.target.getAttribute("data-id") in listed function
+            //         center.addEventListener("click", goToHOSLogs, false);
+
+            //         //temp log # of Edit Log results
+            //         console.log('Number of AUDIT EDIT results received: ' + result.length);
+
+            //         // Filter HOS Results to just Rejected before passing into tableCreator using extractValues function above
+            //         let filteredResult = result
+            //             .filter(r => {
+            //                 if (r.comment) {
+            //                     let comment = r.comment.toLowerCase().replaceAll(' ', '');
+            //                     return (!comment.includes('addedannotations')) && (comment.includes('state:rejected') || comment.includes('state:active'));
+            //                 }
+            //                 return false; // If r.comment is undefined or null, do not include r in the filtered result
+            //             })
+            //             .map(r => {
+            //                 let info = extractValues(r.comment);
+            //                 if (info) {
+            //                     let {
+            //                         ID,
+            //                         State,
+            //                         Status,
+            //                         EventRecordStatus,
+            //                         Driver,
+            //                         Device,
+            //                         Timestamp
+            //                     } = info;
+            //                     console.log(`Driver:${Driver}, Device:${Device}, Timestamp:${Timestamp}, HOS Log ID:${ID}, State:${State}, Status:${Status}, EventRecordStatus:${EventRecordStatus}`);
+            //                     return { ...r, ...info }; // Merge the properties of r and info
+            //                 } else {
+            //                     console.log('Error extracting info from comment:', r.comment);
+            //                     return null;
+            //                 }
+            //             });
+
+            //         center.appendChild(tableCreator(filteredResult));
+            //         //HOS EDITS API NOW COMPLETED AND TABLE BUILT
+
+            //         // parse another managerFilteredResult to match up to the existing "data-id" rows and fill ID
+            //         function extractValuesfromManagerEdit(logString) {
+            //             try {
+            //                 const idMatch = logString.match(/ID: ([\w\-_]+),/);
+
+            //                 const extractManagerEditResult = {
+            //                     ID: idMatch ? idMatch[1] : undefined
+            //                 };
+            //                 //temp console log the logstring
+            //                 console.log("HOS Manager EDIT comment ID", logString);
+
+            //                 return extractManagerEditResult;
+            //             } catch (error) {
+            //                 console.error('Error parsing the HOS Manager EDIT log string', error);
+            //                 return null;
+            //             }
+            //         }
+
+            //         let managerFilteredResult = result
+            //             .filter(r => {
+            //                 if (r.comment) {
+            //                     let comment = r.comment.toLowerCase().replaceAll(' ', '');
+            //                     return (comment.includes('state:requested') && comment.includes('origin:unassigned'));
+            //                 }
+            //                 return false; // If r.comment is undefined or null, do not include r in the filtered result
+            //             })
+            //             .map(r => {
+            //                 let info = extractValuesfromManagerEdit(r.comment);
+            //                 if (info) {
+            //                     let {
+            //                         ID
+            //                     } = info;
+            //                     console.log(`Unassigned Manager edit ID:${ID}`);
+            //                     return { ...r, ...info }; // Merge the properties of r and info
+            //                 } else {
+            //                     console.log('Error extracting info from comment:', r.comment);
+            //                     return null;
+            //                 }
+            //             });
+
+            //         // look over the existing rows to fill in manager unassigned edits data   
+            //         let tableRows = center.getElementsByTagName("tr");
+            //         for (let i = 1; i < tableRows.length; i++) {
+            //             //first row is actually headers row so starting loop at 1
+            //             let row = tableRows[i];
+            //             let id = row.getElementsByTagName("td")[0].getAttribute("data-id");
+            //             let matchingAdd = managerFilteredResult.find(r => r.ID === id);
+            //             if (matchingAdd) {
+            //                 let {
+            //                     userName,
+            //                     dateTime
+            //                 } = matchingAdd;
+            //                 let tdManuallyAddedBy = row.getElementsByTagName("td")[5];
+            //                 let tdLogType = row.getElementsByTagName("td")[6];
+            //                 let tdManuallyAddedDate = row.getElementsByTagName("td")[7];
+            //                 tdManuallyAddedBy.textContent = userName;
+            //                 tdLogType.textContent = "Auto Created D/ON";
+            //                 // Convert the dateTime property to a friendly format for ManuallyAddedDate
+            //                 let date = new Date(dateTime);
+            //                 let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            //                 tdManuallyAddedDate.textContent = date.toLocaleDateString('en-US', options).replace(',', '');
+            //             }
+            //         }
+
+
+            //         // After table created with placeholders for HOS ADD Audit entries in place and HOS EDIT Table is filled and modified with edit additional manager data
+            //         // get the HOS ADD results to filter and parse and match back up to "data-id" rows
+            //         api.call("Get", {
+            //             typeName: "Audit",
+            //             search: {
+            //                 name: "HosLogAdd",
+            //                 fromDate: ISOfromDate,
+            //                 toDate: ISOtoDate
+            //             },
+            //             resultsLimit: 50000
+            //         }, function (result) {
+            //             //function to parse HOS ADD comment HOS log ID and Log Status
+            //             function extractValuesFromAddHOS(logString) {
+            //                 try {
+            //                     const idMatch = logString.match(/ID: ([\w\-_]+),/);
+            //                     const statusMatch = logString.match(/Status: (\w+),/);
+
+            //                     const extractHOSAddResult = {
+            //                         ID: idMatch ? idMatch[1] : undefined,
+            //                         Status: statusMatch ? statusMatch[1] : undefined
+            //                     };
+            //                     //temp console log the logstring
+            //                     console.log("HOS ADD comment", logString);
+
+            //                     return extractHOSAddResult;
+            //                 } catch (error) {
+            //                     console.error('Error parsing the HOS ADD log string', error);
+            //                     return null;
+            //                 }
+            //             }
+
+            //             //temp log # of Add Log results
+            //             console.log('Number of AUDIT ADD results received: ' + result.length);
+
+            //             // Filter HOS Results to just Other Authenticate User Adds 
+            //             let filteredResult = result
+            //                 .filter(r => {
+            //                     if (r.comment) {
+            //                         let comment = r.comment.toLowerCase().replaceAll(' ', '');
+            //                         return (comment.includes('origin:otherauthenticateduser'));
+            //                     }
+            //                     return false; // If r.comment is undefined or null, do not include r in the filtered result
+            //                 })
+            //                 .map(r => {
+            //                     let info = extractValuesFromAddHOS(r.comment);
+            //                     if (info) {
+            //                         let {
+            //                             ID,
+            //                             Status,
+            //                         } = info;
+            //                         console.log(`HOS ADD COMMENT - ID:${ID}, Status:${Status}`);
+            //                         return { ...r, ...info }; // Merge the properties of r and info
+            //                     } else {
+            //                         console.log('Error extracting info from HOS ADD comment:', r.comment);
+            //                         return null;
+            //                     }
+            //                 });
+
+            //             // Get the Existing Edit HOS table rows and iterate through them to match up the HOS ADD results to the "data-id" rows
+            //             let tableRows = center.getElementsByTagName("tr");
+            //             for (let i = 1; i < tableRows.length; i++) {
+            //                 //first row is actually headers row so starting loop at 1
+            //                 let row = tableRows[i];
+            //                 let id = row.getElementsByTagName("td")[0].getAttribute("data-id");
+            //                 let matchingAdd = filteredResult.find(r => r.ID === id);
+            //                 if (matchingAdd) {
+            //                     let {
+            //                         userName,
+            //                         Status,
+            //                         dateTime
+            //                     } = matchingAdd;
+            //                     let tdManuallyAddedBy = row.getElementsByTagName("td")[5];
+            //                     let tdLogType = row.getElementsByTagName("td")[6];
+            //                     let tdManuallyAddedDate = row.getElementsByTagName("td")[7];
+            //                     tdManuallyAddedBy.textContent = userName;
+            //                     tdLogType.textContent = Status;
+
+            //                     // Convert the dateTime property to a friendly format
+            //                     let date = new Date(dateTime);
+            //                     let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            //                     tdManuallyAddedDate.textContent = date.toLocaleDateString('en-US', options).replace(',', '');
+            //                 }
+            //                 // check final contents for leftover "Loading..." Cells in "Manually Assigned By" on resulting table as they are just Engine Power Up/Down Auto logs not to be shown
+            //                 let finalcheckcell = row.getElementsByTagName("td")[5];
+            //                 if (finalcheckcell.innerText === "Loading...") {
+            //                     row.parentNode.removeChild(row);
+            //                     i--; // IMPORTANT Decrement the counter as the rows list is now shorter
+            //                 }
+            //             }
+
+            //         }, function (error) {
+            //             console.log(error.message);
+            //         });
+            //     }, function (error) {
+            //         console.log(error.message);
+            //     });
 
             //Create searchable table listener after full table created
             let searchinput = document.getElementById('de-searchInput');
