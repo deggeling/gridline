@@ -96,7 +96,6 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                 //     tdLogStatus.textContent = entity.comment;
                 // }
                 tdLogStatus.textContent = "PENDING";
-                tdLogStatus.backgroundColor = "#f8f576";
                 tr.appendChild(tdLogStatus);
 
 
@@ -515,6 +514,8 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                             let tdLogStatus = row.getElementsByTagName("td")[0];
                             let tdDateTime = row.getElementsByTagName("td")[7];
 
+                            //Set background for ALL first column to yellow (for Pendings), before parsing through matches and recoloring over
+                            tdLogStatus.backgroundColor = "#f8f576";
 
                             //parse the driver comments where the id matches a row to fill in HOS Log Status details
                             if (!comment.includes('Added Annotations') && comment.includes('State: Rejected') && comment.includes('Origin: Unassigned')) {
@@ -538,7 +539,7 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
 
 
 
-                        // check final contents for leftover "Loading..." Cells in "Manually Assigned By" on resulting table as they are just Engine Power Up/Down Auto logs not to be shown
+                        // check final contents for leftover "PENDING" Cells in first column
                         // let finalcheckcell = row.getElementsByTagName("td")[5];
                         // if (finalcheckcell.innerText === "Loading...") {
                         //     row.parentNode.removeChild(row);
