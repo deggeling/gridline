@@ -515,7 +515,7 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                             let tdDateTime = row.getElementsByTagName("td")[7];
 
                             //Set background for ALL first column to yellow (for Pendings), before parsing through matches and recoloring over
-                            tdLogStatus.backgroundColor = "#f8f576";
+                            tdLogStatus.style.backgroundColor = "#f8f576";
 
                             //parse the driver comments where the id matches a row to fill in HOS Log Status details
                             if (!comment.includes('Added Annotations') && comment.includes('State: Rejected') && comment.includes('Origin: Unassigned')) {
