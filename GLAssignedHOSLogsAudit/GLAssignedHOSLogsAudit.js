@@ -144,7 +144,11 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
 
                 // Create "Log Type" cell
                 var tdLogType = document.createElement("TD");
-                tdLogType.textContent = entity.Status;
+                if (entity.Status === "ON" || entity.Status === "OFF" || entity.Status === "SB") {
+                    tdLogType.textContent = entity.Status;
+                } else {
+                    tdLogType.textContent = "Auto Created D/ON";
+                }
                 tr.appendChild(tdLogType);
 
 
