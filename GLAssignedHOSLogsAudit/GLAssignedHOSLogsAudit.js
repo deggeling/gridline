@@ -95,7 +95,8 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                 // } else {
                 //     tdLogStatus.textContent = entity.comment;
                 // }
-                tdLogStatus.textContent = "Loading...";
+                tdLogStatus.textContent = "PENDING";
+                tdLogStatus.backgroundColor = "#f8f576";
                 tr.appendChild(tdLogStatus);
 
 
@@ -107,7 +108,7 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
 
                 // Create "Assignment Date" cell
                 var tdManuallyAddedDate = document.createElement("TD");
-                tdManuallyAddedDate.textContent = "Loading...";
+                // tdManuallyAddedDate.textContent = "Loading...";
                 if (entity.dateTime) {
                     var dateTimeDate = new Date(entity.dateTime);
                     var dateFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
@@ -118,7 +119,7 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                 tr.appendChild(tdManuallyAddedDate);
 
 
-                // Create "UserName/Driver" cell  (this may be null/undefined until driver details due to parse comment, check later)
+                // Create "UserName/Driver" cell 
                 var tdName = document.createElement("TD");
                 tdName.textContent = entity.Driver;
                 tr.appendChild(tdName);
@@ -156,14 +157,7 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                 // Create "Rejected dateTime" cell, format example content "dateTime": "2015-02-12T22:40:57.522Z" to 02/12/2015 10:40:57 PM, convert to browser local TZ
                 // could also be "pending and no match to fill in later"
                 var tdDateTime = document.createElement("TD");
-                // if (entity.dateTime) {
-                //     var dateTimeDate = new Date(entity.dateTime);
-                //     var dateFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-                //     tdDateTime.textContent = dateTimeDate.toLocaleDateString('en-us', dateFormatOptions).replace(',', '');
-                // } else {
-                //     tdDateTime.textContent = "N/A";
-                // }
-                tdDateTime.textContent = "Loading...";
+                tdDateTime.textContent = "Pending Driver Acc/Rej";
                 tr.appendChild(tdDateTime);
 
 
