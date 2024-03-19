@@ -503,6 +503,8 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                         //first row is actually headers row so starting loop at 1
                         let row = tableRows[i];
                         let id = row.getElementsByTagName("td")[0].getAttribute("data-id");
+                        let tdLogStatus = row.getElementsByTagName("td")[0];
+                        let tdDateTime = row.getElementsByTagName("td")[7];
                         let matchingAcceptReject = driverFilteredResult.find(r => r.ID === id);
                         if (matchingAcceptReject) {
                             let {
@@ -511,11 +513,9 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                                 Status,
                                 dateTime
                             } = matchingAcceptReject;
-                            let tdLogStatus = row.getElementsByTagName("td")[0];
-                            let tdDateTime = row.getElementsByTagName("td")[7];
 
-                            //Set background for ALL first column to yellow (for Pendings), before parsing through matches and recoloring over
-                            tdLogStatus.style.backgroundColor = "#f8f576";
+
+
 
                             //parse the driver comments where the id matches a row to fill in HOS Log Status details
                             if (!comment.includes('Added Annotations') && comment.includes('State: Rejected') && comment.includes('Origin: Unassigned')) {
@@ -535,6 +535,9 @@ geotab.addin.GLAssignedHOSLogsAudit = function (api, state) {
                             let date = new Date(dateTime);
                             let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
                             tdDateTime.textContent = date.toLocaleDateString('en-US', options).replace(',', '');
+                        } else {
+                            //Set background color for first column cell to yellow (for Pendings) if didnt have a matching driver acc/rej
+                            tdLogStatus.style.backgroundColor = "#f8f576";
                         }
 
 
