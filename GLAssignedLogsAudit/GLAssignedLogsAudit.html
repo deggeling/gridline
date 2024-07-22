@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gridline Accepted or Rejected HOS Logs</title>
+    <link rel="stylesheet" href="GLAssignedLogsAudit.css">
+    <script src="GLAssignedLogsAudit.js" defer></script>
+</head>
+
+<body>
+    <div id="de-buttonContainer">
+        <button id="de_HOSLogsButton" class="de-HOSLogs-button">To Geotab HOS Logs</button>
+        <div class="de-datePickerContainer">
+            <label class="date-picker-label" for="fromDate">From :</label>
+            <input type="date" id="fromDate" name="fromDate">
+            <label class="date-picker-label" for="toDate">To :</label>
+            <input type="date" id="toDate" name="toDate">
+            <button id="refreshDataButton">Refresh Data</button>
+        </div>
+        <button id="de_ExportButton" class="de-Export-button">Export to CSV</button>
+    </div>
+    <div class="de-title-bar">
+        <h1>Gridline - Assigned HOS Logs Audit - BETA</h1>
+        <input type="text" class="de-searchBox" id="de-searchInput" placeholder="Search">
+    </div>
+    <div id="center">
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,125 @@
+.de-title-bar {
+    background-color: #ED8B00;
+    color: white;
+    text-align: left;
+    padding: 4px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.de-title-bar .de-searchBox {
+    padding: 5px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+
+#center {
+    padding: 5px;
+}
+
+.de-responsive-table {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.de-responsive-table table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 5px 5px 0 0;
+    overflow: hidden;
+}
+
+.de-responsive-table th,
+.de-responsive-table td {
+    border: 1px solid #ddd;
+    padding: 5px;
+    text-align: left;
+    font-size: 14px;
+}
+
+
+.de-responsive-table td:first-child,
+.de-responsive-table th:first-child {
+    cursor: pointer;
+}
+
+.de-responsive-table tr:hover {
+    background-color: #c4d0db;
+}
+
+.de-responsive-table th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.de-responsive-table tr:last-of-type {
+    border-bottom: 2px solid #4CAF50;
+}
+
+#de-buttonContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
+#de_HOSLogsButton.de-HOSLogs-button,
+#de_ExportButton.de-Export-button {
+    background-color: #75787B;
+    /* Green background */
+    border: none;
+    /* No border */
+    color: white;
+    /* White text */
+    padding: 15px 32px;
+    /* Some padding */
+    text-align: center;
+    /* Centered text */
+    text-decoration: none;
+    /* No underline */
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    /* Pointer/hand icon */
+    transition-duration: 0.4s;
+    /* Transition effect */
+}
+
+#de_HOSLogsButton.de-HOSLogs-button:hover,
+#de_ExportButton.de-Export-button:hover {
+    background-color: #ED8B00;
+    /* Green background on hover */
+}
+
+.de-datePickerContainer {
+    display: flex;
+    align-items: center;
+}
+
+.date-picker-label {
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+input[type="date"] {
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin-right: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+#refreshDataButton {
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+    transition-duration: 0.1s;
+}
+
+#refreshDataButton:hover {
+    background-color: #ED8B00;
+    color: white;
+}
