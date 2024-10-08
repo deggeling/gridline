@@ -35,7 +35,6 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
             tr.appendChild(th5);
 
 
-            // create 3 placeholder headers for the 3 new columns to be filled in by second API call data details relation by LogID based on driver accept/reject
             // NEW -- Create a "Date of HOS Log" header (was th5), this is also no longer a placeholder and grabbed during initial manager initiated call
             var th6 = document.createElement("TH");
             th6.textContent = "Date of HOS Log";
@@ -163,6 +162,7 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                 });
             }
         },
+
         //Function to grab and export current table structure to CSV triggered on export button click
         exportToCSV = function () {
             let headers = Array.from(document.querySelectorAll('.de-responsive-table table th')).map(th => th.textContent);
@@ -179,13 +179,14 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
             let fileyear = filedate.getFullYear();
             let filemonth = (filedate.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based in JavaScript
             let fileday = filedate.getDate().toString().padStart(2, '0');
-            let filename = 'GL_AssignedHOSLogsAudit' + fileday + filemonth + fileyear + '.csv';
+            let filename = 'GL_AssignedLogsAudit_' + fileday + filemonth + fileyear + '.csv';
             link.setAttribute("download", filename);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         },
+
         //Function for handling refresh button clicks
         refreshDataButtonClickHandler = function () {
             // Get the startDate and endDate values from the date pickers
@@ -219,10 +220,9 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
             refreshPage(formattedFromDate, formattedToDate);
         },
 
-
         //new format main function for API calls and redraws of table content 
         refreshPage = function (fromDate, toDate) {
-            // If no arguments are provided, default to the current date and 1 day past
+            // If no arguments are provided, default to the current date and 1 day past (essentially page initial entry)
             let now = toDate ? new Date(toDate) : new Date();
             let sevenDaysAgo = fromDate ? new Date(fromDate) : new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000);
 
@@ -241,21 +241,80 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
 
 
 
-            // Get the refreshDataButton element, remove listener if it exists(doesnt fail if not), then add a new one to prevent duplication of API calls/table draw
+            // Get the refreshDataButton element, remove listener if it exists (doesnt fail if not), then add a new one to prevent duplication of API calls/table draw
             let refreshDataButton = document.getElementById('refreshDataButton');
             refreshDataButton.removeEventListener('click', refreshDataButtonClickHandler);
             refreshDataButton.addEventListener('click', refreshDataButtonClickHandler);
 
 
-            api.call("Get", {
-                typeName: "Audit",
-                search: {
-                    name: "HosLogEdit",
-                    fromDate: ISOfromDate,
-                    toDate: ISOtoDate
-                },
-                resultsLimit: 50000
-            }, function (result) {
+            // BEGIN OF NEW CODE PAGING FUNCTIONALITY
+            const resultsLimit = 50000;
+            const totalStartTime = new Date(); // Capture the start time for the entire process
+
+            function fetchAllHOSEdits(ISOfromDate, ISOtoDate) {
+                return new Promise((resolve, reject) => {
+                    const allHosLogEdits = [];
+                    let pageCount = 0;
+                    let offset = null;
+                    let lastId = null;
+
+                    function fetchEditsPage() {
+                        const pageStartTime = new Date(); // Capture start time for the page
+
+                        api.call("Get", {
+                            typeName: "Audit",
+                            search: {
+                                name: "HosLogEdit",
+                                fromDate: ISOfromDate,
+                                toDate: ISOtoDate
+                            },
+                            "sort": {
+                                "sortBy": "date",
+                                "sortDirection": "desc",
+                                "offset": offset,
+                                "lastId": lastId
+                            },
+                            "resultsLimit": resultsLimit
+                        }, function (results) {
+                            if (!results || results.length === 0) {
+                                const totalEndTime = new Date(); // Capture the end time for the entire process
+                                const totalDuration = (totalEndTime - totalStartTime) / 1000; // Calculate total duration in seconds
+                                console.log(`Total Audit Edits Received: ${allHosLogEdits.length} in ${pageCount} Total Pages`);
+                                console.log(`Total Duration: ${totalDuration} seconds`);
+                                resolve(allHosLogEdits);
+                                return;
+                            }
+
+                            pageCount++;
+                            const pageEndTime = new Date(); // Capture end time for the page
+                            const pageDuration = (pageEndTime - pageStartTime) / 1000; // Calculate duration in seconds
+                            console.log(`Page ${pageCount} fetched in ${pageDuration} seconds`);
+
+                            allHosLogEdits.push(...results);
+
+                            // Update the offset and lastId for the next page
+                            offset = results[results.length - 1].dateTime;
+                            lastId = results[results.length - 1].id;
+
+                            // Fetch the next page
+                            fetchEditsPage();
+                        }, function (error) {
+                            reject(error);
+                        });
+                    }
+
+                    // Start fetching pages
+                    fetchEditsPage();
+                });
+            }
+
+
+
+            // END OF NEW CODE PAGING FUNCTIONALITY
+
+            fetchAllHOSEdits(ISOfromDate, ISOtoDate).then(result => {
+
+
 
                 // Function for parsing Audit EDIT Log HOS items and fields
                 function extractValues(logString) {
@@ -288,6 +347,7 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
 
                 // Add Eventer Listener to Parent Div to handle event delegation for any children in table with event.target.getAttribute("data-id") in listed function
                 center.addEventListener("click", goToHOSLogs, false);
+
                 //temp log # of Edit Log results
                 console.log('Number of AUDIT EDIT results received: ' + result.length);
 
@@ -402,9 +462,10 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                     //Combine the filtered Manager Edits and Adds Arrays by spreading and send over to tableCreator
                     let managerCombinedResult = [...managerFilteredResult, ...managerFilteredResultAdds];
                     center.appendChild(tableCreator(managerCombinedResult));
+
+
                     //HOS  API NOW COMPLETED AND TABLE BUILT out of Manager Edits/Adds
                     //MORE TO COME, Parse through the now built table matching up drivers and then "pending" the missings
-
 
 
                     // Get the Existing Edit HOS table rows and iterate through them to match up the HOS ADD results to the "data-id" rows
@@ -423,9 +484,6 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                                 Status,
                                 dateTime
                             } = matchingAcceptReject;
-
-
-
 
                             //parse the driver comments where the id matches a row to fill in HOS Log Status details
                             if (!comment.includes('Added Annotations') && comment.includes('State: Rejected') && comment.includes('Origin: Unassigned')) {
@@ -486,7 +544,7 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
 
         },
 
-        //Function to cleanup event listeners and remove the center div inner html when "blur" or in otherwords when user navigates away from addin page
+        //Function to cleanup event listeners and remove the center div inner html when "blur" or in other words, when user navigates away from addin page
         clearOnLeaving = function () {
             center.removeEventListener("click", goToHOSLogs, false);
             document.getElementById('de_ExportButton').removeEventListener('click', exportToCSV);
