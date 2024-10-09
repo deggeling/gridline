@@ -321,7 +321,7 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                         api.call("Get", {
                             typeName: "Audit",
                             search: {
-                                name: "HosLogEdit",
+                                name: "HosLogAdd",
                                 fromDate: ISOfromDate,
                                 toDate: ISOtoDate
                             },
@@ -336,7 +336,7 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                             if (!results || results.length === 0) {
                                 const totalEndTime = new Date(); // Capture the end time for the entire process
                                 const totalDuration = (totalEndTime - totalStartTime) / 1000; // Calculate total duration in seconds
-                                console.log(`Total Audit Edits Received: ${allHosLogAdds.length} in ${pageCount} Total Pages`);
+                                console.log(`Total Audit Adds Received: ${allHosLogAdds.length} in ${pageCount} Total Pages`);
                                 console.log(`Total Duration: ${totalDuration} seconds`);
                                 resolve(allHosLogAdds);
                                 return;
