@@ -308,13 +308,66 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                 });
             }
 
+            function fetchAllHOSAdds(ISOfromDate, ISOtoDate) {
+                return new Promise((resolve, reject) => {
+                    const allHosLogAdds = [];
+                    let pageCount = 0;
+                    let offset = null;
+                    let lastId = null;
 
+                    function fetchAddsPage() {
+                        const pageStartTime = new Date(); // Capture start time for the page
+
+                        api.call("Get", {
+                            typeName: "Audit",
+                            search: {
+                                name: "HosLogEdit",
+                                fromDate: ISOfromDate,
+                                toDate: ISOtoDate
+                            },
+                            "sort": {
+                                "sortBy": "date",
+                                "sortDirection": "desc",
+                                "offset": offset,
+                                "lastId": lastId
+                            },
+                            "resultsLimit": resultsLimit
+                        }, function (results) {
+                            if (!results || results.length === 0) {
+                                const totalEndTime = new Date(); // Capture the end time for the entire process
+                                const totalDuration = (totalEndTime - totalStartTime) / 1000; // Calculate total duration in seconds
+                                console.log(`Total Audit Edits Received: ${allHosLogAdds.length} in ${pageCount} Total Pages`);
+                                console.log(`Total Duration: ${totalDuration} seconds`);
+                                resolve(allHosLogAdds);
+                                return;
+                            }
+
+                            pageCount++;
+                            const pageEndTime = new Date(); // Capture end time for the page
+                            const pageDuration = (pageEndTime - pageStartTime) / 1000; // Calculate duration in seconds
+                            console.log(`Page ${pageCount} fetched in ${pageDuration} seconds`);
+
+                            allHosLogAdds.push(...results);
+
+                            // Update the offset and lastId for the next page
+                            offset = results[results.length - 1].dateTime;
+                            lastId = results[results.length - 1].id;
+
+                            // Fetch the next page
+                            fetchAddsPage();
+                        }, function (error) {
+                            reject(error);
+                        });
+                    }
+
+                    // Start fetching pages
+                    fetchAddsPage();
+                });
+            }
 
             // END OF NEW CODE PAGING FUNCTIONALITY
 
             fetchAllHOSEdits(ISOfromDate, ISOtoDate).then(result => {
-
-
 
                 // Function for parsing Audit EDIT Log HOS items and fields
                 function extractValues(logString) {
@@ -416,15 +469,7 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
 
                 // After table created with placeholders for HOS ADD Audit entries in place and HOS EDIT Table is filled and modified with edit additional manager data
                 // get the HOS ADD results to filter and parse and match back up to "data-id" rows
-                api.call("Get", {
-                    typeName: "Audit",
-                    search: {
-                        name: "HosLogAdd",
-                        fromDate: ISOfromDate,
-                        toDate: ISOtoDate
-                    },
-                    resultsLimit: 50000
-                }, function (result) {
+                fetchAllHOSAdds(ISOfromDate, ISOtoDate).then(result => {
 
                     //temp log # of Add Log results
                     console.log('Number of AUDIT ADD results received: ' + result.length);
