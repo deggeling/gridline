@@ -26,7 +26,7 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
 
             // NEW -- Create "User/Driver" header (was th3)
             var th4 = document.createElement("TH");
-            th4.textContent = "User/Driver"
+            th4.textContent = "Driver"
             tr.appendChild(th4);
 
             // NEW -- Create "Vehicle" header (was th4)
@@ -56,7 +56,7 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
             tableElement.appendChild(thead);
 
 
-            // Sort entites before creating table rows in descending order (latest first by order rejected/accepted)
+            // Sort entites before creating table rows in descending order (latest first by order assigned)
             entities.sort(function (a, b) {
                 var dateA = a.dateTime ? new Date(a.dateTime) : new Date(-8640000000000000);  //Earliest date in JS for no prop/no date
                 var dateB = b.dateTime ? new Date(b.dateTime) : new Date(-8640000000000000);
@@ -568,6 +568,7 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
 
 
             //Create searchable table listener after full table created
+            /*DISABLE SEARCH FOR NOW
             let searchinput = document.getElementById('de-searchInput');
             let searchTableRows = center.getElementsByTagName("tr");
 
@@ -585,7 +586,7 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                         searchTableRows[i].style.display = "none";
                     }
                 }
-            });
+            }); */
 
         },
 
@@ -602,7 +603,6 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                 .addEventListener("click", function () {
                     state.gotoPage("hosLogs");
                 }, false);
-            //document.getElementById('de_ExportButton').addEventListener('click', exportToCSV);
             callback();
         },
         focus: function (api, state) {
