@@ -176,10 +176,10 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
             let link = document.createElement("a");
             link.setAttribute("href", url);
             let filedate = new Date();
-            let fileyear = filedate.getFullYear();
+            let fileyear = filedate.getFullYear().toString().slice(-2);
             let filemonth = (filedate.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based in JavaScript
             let fileday = filedate.getDate().toString().padStart(2, '0');
-            let filename = 'GL_AssignedLogsAudit_' + fileday + filemonth + fileyear + '.csv';
+            let filename = 'GL_AssignedLogsAudit_' + filemonth + fileday + + fileyear + '.csv';
             link.setAttribute("download", filename);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
