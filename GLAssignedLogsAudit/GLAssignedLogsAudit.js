@@ -179,7 +179,7 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
             let fileyear = filedate.getFullYear().toString().slice(-2);
             let filemonth = (filedate.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based in JavaScript
             let fileday = filedate.getDate().toString().padStart(2, '0');
-            let filename = 'GL_AssignedLogsAudit_' + filemonth + fileday + + fileyear + '.csv';
+            let filename = 'GL_AssignedLogsAudit_' + filemonth + fileday + fileyear + '.csv';
             link.setAttribute("download", filename);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
@@ -279,8 +279,8 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                             if (!results || results.length === 0) {
                                 const totalEndTime = new Date(); // Capture the end time for the entire process
                                 const totalDuration = (totalEndTime - totalStartTime) / 1000; // Calculate total duration in seconds
-                                console.log(`Total Audit Edits Received: ${allHosLogEdits.length} in ${pageCount} Total Pages`);
-                                console.log(`Total Duration: ${totalDuration} seconds`);
+                                console.log(`Total Audit EDITS Received: ${allHosLogEdits.length} in ${pageCount} Total Pages`);
+                                console.log(`Total EDITS Duration: ${totalDuration} seconds`);
                                 resolve(allHosLogEdits);
                                 return;
                             }
@@ -336,8 +336,8 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                             if (!results || results.length === 0) {
                                 const totalEndTime = new Date(); // Capture the end time for the entire process
                                 const totalDuration = (totalEndTime - totalStartTime) / 1000; // Calculate total duration in seconds
-                                console.log(`Total Audit Adds Received: ${allHosLogAdds.length} in ${pageCount} Total Pages`);
-                                console.log(`Total Duration: ${totalDuration} seconds`);
+                                console.log(`Total Audit ADDS Received: ${allHosLogAdds.length} in ${pageCount} Total Pages`);
+                                console.log(`Total ADDS Duration: ${totalDuration} seconds`);
                                 resolve(allHosLogAdds);
                                 return;
                             }
@@ -376,8 +376,8 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                         const stateMatch = logString.match(/State: (\w+)/);
                         const statusMatch = logString.match(/Status: (\w+)/);
                         const eventRecordStatusMatch = logString.match(/EventRecordStatus: (\d+)/);
-                        const driver = logString.match(/Driver: (\w+)/);
-                        const deviceMatch = logString.match(/Device: ([\w-]+)/);
+                        const driver = logString.match(/Driver: ([\w@.\-]+)/);
+                        const deviceMatch = logString.match(/Device: (.+?)\s*\(ID/);
                         const timestamp = logString.match(/Timestamp: (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)/);
 
 
@@ -400,10 +400,6 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
 
                 // Add Eventer Listener to Parent Div to handle event delegation for any children in table with event.target.getAttribute("data-id") in listed function
                 center.addEventListener("click", goToHOSLogs, false);
-
-                //temp log # of Edit Log results
-                console.log('Number of AUDIT EDIT results received: ' + result.length);
-
 
 
                 //Driver Accept/Rejects Filter from Edits
@@ -471,9 +467,6 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                 // get the HOS ADD results to filter and parse and match back up to "data-id" rows
                 fetchAllHOSAdds(ISOfromDate, ISOtoDate).then(result => {
 
-                    //temp log # of Add Log results
-                    console.log('Number of AUDIT ADD results received: ' + result.length);
-
                     // Filter HOS Results to just Other Authenticate User Adds 
                     let managerFilteredResultAdds = result
                         .filter(r => {
@@ -506,6 +499,7 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
 
                     //Combine the filtered Manager Edits and Adds Arrays by spreading and send over to tableCreator
                     let managerCombinedResult = [...managerFilteredResult, ...managerFilteredResultAdds];
+                    console.log(`Total number of rows to display: ${managerCombinedResult.length}`);
                     center.appendChild(tableCreator(managerCombinedResult));
 
 
