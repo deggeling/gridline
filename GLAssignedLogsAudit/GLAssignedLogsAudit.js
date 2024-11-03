@@ -472,7 +472,9 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                         .filter(r => {
                             if (r.comment) {
                                 let comment = r.comment.toLowerCase().replaceAll(' ', '');
-                                return (comment.includes('origin:otherauthenticateduser'));
+                                let userName = r.userName.toLowerCase();  //making sure comparison username is also lowercase as comment is made lower
+                                //return (comment.includes('origin:otherauthenticateduser'));
+                                return comment.includes('origin:otherauthenticateduser') && !comment.includes(userName);
                             }
                             return false; // If r.comment is undefined or null, do not include r in the filtered result
                         })
