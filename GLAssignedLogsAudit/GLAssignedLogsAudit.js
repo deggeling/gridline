@@ -71,7 +71,7 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
             // Create table rows and data entries out of API results object
             entities.forEach(function (entity) {
 
-                console.log(entity.userName, entity.groupNames)
+                // console.log(entity.userName, entity.groupNames)
 
                 // Create a new row for the entity and its shown details
                 var tr = document.createElement("TR");
