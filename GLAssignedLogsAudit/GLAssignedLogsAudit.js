@@ -29,6 +29,10 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
             th4.textContent = "Driver"
             tr.appendChild(th4);
 
+            var thGroups = document.createElement("TH");
+            thGroups.textContent = "Driver Groups"
+            tr.appendChild(thGroups);
+
             // NEW -- Create "Vehicle" header (was th4)
             var th5 = document.createElement("TH");
             th5.textContent = "Vehicle";
@@ -67,13 +71,15 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
             // Create table rows and data entries out of API results object
             entities.forEach(function (entity) {
 
+                console.log(entity.userName, entity.groupNames)
+
                 // Create a new row for the entity and its shown details
                 var tr = document.createElement("TR");
 
                 // Create "HOS Log Status" cell, ith a "data-id" attribute defined by its id for later onclicks on cell
                 var tdLogStatus = document.createElement("TD");
                 tdLogStatus.setAttribute("data-id", entity.ID);
-                console.log(entity.comment);
+                // TEMP DISABLE COMMENT LOGGING   console.log(entity.comment);
                 tdLogStatus.textContent = "PENDING";
                 tr.appendChild(tdLogStatus);
 
@@ -100,6 +106,11 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                 var tdName = document.createElement("TD");
                 tdName.textContent = entity.Driver;
                 tr.appendChild(tdName);
+
+                // Create "Driver Groups" cell 
+                var tdGroups = document.createElement("TD");
+                tdGroups.textContent = entity.groupNames;
+                tr.appendChild(tdGroups);
 
 
                 // Create "Device" cell from parsed string entry
@@ -149,6 +160,7 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
             var divElement = document.createElement("DIV");
             divElement.className = "de-responsive-table";
             divElement.appendChild(tableElement);
+            console.log("Initial Table Created")
             return divElement;
         },
 
@@ -337,7 +349,7 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                                 const totalEndTime = new Date(); // Capture the end time for the entire process
                                 const totalDuration = (totalEndTime - totalStartTime) / 1000; // Calculate total duration in seconds
                                 console.log(`Total Audit ADDS Received: ${allHosLogAdds.length} in ${pageCount} Total Pages`);
-                                console.log(`Total ADDS Duration: ${totalDuration} seconds`);
+                                console.log(`Total Duration After ADDS: ${totalDuration} seconds`);
                                 resolve(allHosLogAdds);
                                 return;
                             }
@@ -499,60 +511,112 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
                         });
 
 
-                    //Combine the filtered Manager Edits and Adds Arrays by spreading and send over to tableCreator
-                    let managerCombinedResult = [...managerFilteredResult, ...managerFilteredResultAdds];
-                    console.log(`Total number of rows to display: ${managerCombinedResult.length}`);
-                    center.appendChild(tableCreator(managerCombinedResult));
+                    // Function to get users and groups
+                    async function getUsersAndGroups() {
+                        return new Promise((resolve, reject) => {
+                            api.multiCall([
+                                ["Get", { typeName: "User" }],
+                                ["Get", { typeName: "Group" }],
+                            ], function (results) {
+                                let userData = results[0];
+                                let groupData = results[1];
 
+                                // Map group IDs to group names for quick lookup
+                                let groupMap = {};
+                                groupData.forEach(group => {
+                                    groupMap[group.id] = group.name;
+                                });
 
-                    //HOS  API NOW COMPLETED AND TABLE BUILT out of Manager Edits/Adds
-                    //MORE TO COME, Parse through the now built table matching up drivers and then "pending" the missings
+                                // Add groupNames property to each user
+                                userData.forEach(user => {
+                                    let groupNames = user.companyGroups.map(group => {
+                                        return groupMap[group.id] || "Not in Scope";
+                                    }).join('|');
 
+                                    user.groupNames = groupNames;
+                                });
 
-                    // Get the Existing Edit HOS table rows and iterate through them to match up the HOS ADD results to the "data-id" rows
-                    let tableRows = center.getElementsByTagName("tr");
-                    for (let i = 1; i < tableRows.length; i++) {
-                        //first row is actually headers row so starting loop at 1
-                        let row = tableRows[i];
-                        let id = row.getElementsByTagName("td")[0].getAttribute("data-id");
-                        let tdLogStatus = row.getElementsByTagName("td")[0];
-                        let tdDateTime = row.getElementsByTagName("td")[7];
-                        let matchingAcceptReject = driverFilteredResult.find(r => r.ID === id);
-                        if (matchingAcceptReject) {
-                            let {
-                                userName,
-                                comment,
-                                Status,
-                                dateTime
-                            } = matchingAcceptReject;
+                                console.log("Users: ", userData.length);
+                                console.log("Groups: ", groupData.length);
+                                resolve(userData);
 
-                            //parse the driver comments where the id matches a row to fill in HOS Log Status details
-                            if (!comment.includes('Added Annotations') && comment.includes('State: Rejected') && comment.includes('Origin: Unassigned')) {
-                                tdLogStatus.textContent = "REJECTED - Back to Unidentified";
-                                tdLogStatus.style.backgroundColor = '#f3c4c4'; // light red
-                            } else if (!comment.includes('Added Annotations') && comment.includes('State: Rejected')) {
-                                tdLogStatus.textContent = 'REJECTED - Manual Log Addition (no longer exists)';
-                                tdLogStatus.style.backgroundColor = '#f3c4c4'; // light red
-                            } else if (!comment.includes('Added Annotations') && comment.includes('State: Active')) {
-                                tdLogStatus.textContent = 'ACCEPTED - Driver Accepted Log';
-                                tdLogStatus.style.backgroundColor = '#cef3c4';
-                            } else {
-                                tdLogStatus.textContent = comment;
-                            }
-
-                            // Convert the dateTime property to a friendly format
-                            let date = new Date(dateTime);
-                            let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-                            tdDateTime.textContent = date.toLocaleDateString('en-US', options).replace(',', '');
-                        } else {
-                            //Set background color for first column cell to yellow (for Pendings) if didnt have a matching driver acc/rej
-                            tdLogStatus.style.backgroundColor = "#f8f576";
-                        }
+                            }, function (e) {
+                                console.error("Users and Groups Failed: ", e);
+                                reject(e);
+                            });
+                        });
                     }
 
 
 
+                    // Combine the filtered Manager Edits and Adds Arrays by spreading and send over to tableCreator
+                    let managerCombinedResult = [...managerFilteredResult, ...managerFilteredResultAdds];
+                    console.log(`Total number of rows to display: ${managerCombinedResult.length}`);
 
+                    // Fetch users and groups, then combine with managerCombinedResult and then update after table creator
+                    getUsersAndGroups().then(userData => {
+                        // Combine userData with managerCombinedResult and filter to only include matching drivers to artificially scope limit
+                        const filteredManagerCombinedResult = managerCombinedResult.filter(entity => {
+                            const matchingUser = userData.find(user => user.name === entity.Driver);
+                            if (matchingUser) {
+                                entity.groupNames = matchingUser.groupNames;
+                                return true;
+                            }
+                            return false;
+                        });
+
+                        // Pass the combined result to tableCreator
+                        center.appendChild(tableCreator(filteredManagerCombinedResult));
+                    }).then(() => {
+                        //temp disable  console.log("I Should be happening once a table has been appended to center");
+
+                        // Get the Existing Edit HOS table rows after tableCreator completes and iterate through them to match up the HOS ADD/Edit results to the "data-id" rows
+                        let tableRows = center.getElementsByTagName("tr");
+                        for (let i = 1; i < tableRows.length; i++) {
+                            //first row is actually headers row so starting loop at 1
+                            let row = tableRows[i];
+                            let id = row.getElementsByTagName("td")[0].getAttribute("data-id");
+                            let tdLogStatus = row.getElementsByTagName("td")[0];
+                            let tdDateTime = row.getElementsByTagName("td")[8];
+                            let matchingAcceptReject = driverFilteredResult.find(r => r.ID === id);
+                            if (matchingAcceptReject) {
+                                let {
+                                    userName,
+                                    comment,
+                                    Status,
+                                    dateTime
+                                } = matchingAcceptReject;
+
+                                //parse the driver comments where the id matches a row to fill in HOS Log Status details
+                                if (!comment.includes('Added Annotations') && comment.includes('State: Rejected') && comment.includes('Origin: Unassigned')) {
+                                    tdLogStatus.textContent = "REJECTED - Back to Unidentified";
+                                    tdLogStatus.style.backgroundColor = '#f3c4c4'; // light red
+                                } else if (!comment.includes('Added Annotations') && comment.includes('State: Rejected')) {
+                                    tdLogStatus.textContent = 'REJECTED - Manual Log Addition (no longer exists)';
+                                    tdLogStatus.style.backgroundColor = '#f3c4c4'; // light red
+                                } else if (!comment.includes('Added Annotations') && comment.includes('State: Active')) {
+                                    tdLogStatus.textContent = 'ACCEPTED - Driver Accepted Log';
+                                    tdLogStatus.style.backgroundColor = '#cef3c4';
+                                } else {
+                                    tdLogStatus.textContent = comment;
+                                }
+
+                                // Convert the dateTime property to a friendly format
+                                let date = new Date(dateTime);
+                                let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                                tdDateTime.textContent = date.toLocaleDateString('en-US', options).replace(',', '');
+                            } else {
+                                //Set background color for first column cell to yellow (for Pendings) if didnt have a matching driver acc/rej
+                                tdLogStatus.style.backgroundColor = "#f8f576";
+                            }
+                        };
+
+
+                    }).catch(error => {
+                        console.error('Error fetching users and groups:', error);
+                    });
+
+                    //HOS  API NOW COMPLETED AND TABLE BUILT out of Manager Edits/Adds
 
                 }, function (error) {
                     console.log(error.message);
@@ -567,15 +631,15 @@ geotab.addin.GLAssignedLogsAudit = function (api, state) {
             /*DISABLE SEARCH FOR NOW
             let searchinput = document.getElementById('de-searchInput');
             let searchTableRows = center.getElementsByTagName("tr");
-
+    
             searchinput.addEventListener('keyup', function () {
                 let filter = searchinput.value.toUpperCase();
-
+    
                 for (let i = 1; i < searchTableRows.length; i++) {
                     let cells = searchTableRows[i].getElementsByTagName('td');
-
+    
                     let match = Array.from(cells).some(cell => cell.innerText.toUpperCase().includes(filter));
-
+    
                     if (match) {
                         searchTableRows[i].style.display = "";
                     } else {
